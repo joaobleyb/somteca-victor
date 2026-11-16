@@ -1,0 +1,13 @@
+<div class="card-som">
+    <div class="capa-box">
+        {% include 'partials/capa.html' with url=playlist.capa_url icone='music-note-list' alt=playlist.nome %}
+    </div>
+    <a href="{{ playlist.get_absolute_url }}" class="card-titulo link-card text-white">
+        {% if not playlist.publica %}<i class="bi bi-lock-fill small text-suave" title="Privada"></i>{% endif %}
+        {{ playlist.nome }}
+    </a>
+    <div class="card-sub">
+        De {{ playlist.usuario.first_name|default:playlist.usuario.username }}
+        {% if playlist.qtd_musicas is not None %} · {{ playlist.qtd_musicas }} música{{ playlist.qtd_musicas|pluralize }}{% endif %}
+    </div>
+</div>

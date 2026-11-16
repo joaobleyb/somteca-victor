@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Busca{% if termo %}: {{ termo }}{% endif %}{% endblock %}
+
+{% block conteudo %}
+{% if not termo %}
+    <div class="text-center py-5">
+        <i class="bi bi-search display-3 text-suave"></i>
+        <h1 class="h3 fw-bold mt-3">Busque músicas, artistas e álbuns</h1>
+        <p class="text-suave">Use a barra de busca no topo da página.</p>
+    </div>
+{% else %}
+    <h1 class="fw-bold mb-1">Resultados para "{{ termo }}"</h1>
+    <p class="text-suave mb-4">{{ total }} resultado{{ total|pluralize }} encontrado{{ total|pluralize }}.</p>
+
+    {% if total == 0 %}
+        <div class="caixa text-center py-5">
+            <p class="mb-0">Nada encontrado. Verifique a ortografia ou tente outras palavras.</p>
+        </div>
+    {% endif %}
+
+    {% if musicas %}
+    <section class="mb-5">
+        <h2 class="h4 fw-bold mb-2">Músicas</h2>
+        {% include 'partials/lista_musicas.html' with fila_id='fila-busca' %}
+    </section>
+    {% endif %}
+
+    {% if artistas %}
+    <section class="mb-5">
+        <h2 class="h4 fw-bold mb-3">Artistas</h2>
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3">
+            {% for artista in artistas %}<div class="col">{% include 'partials/card_artista.html' %}</div>{% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if albuns %}
+    <section class="mb-5">
+        <h2 class="h4 fw-bold mb-3">Álbuns</h2>
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3">
+            {% for album in albuns %}<div class="col">{% include 'partials/card_album.html' %}</div>{% endfor %}
+        </div>
+    </section>
+    {% endif %}
+{% endif %}
+{% endblock %}

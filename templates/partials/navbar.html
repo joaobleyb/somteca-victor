@@ -1,0 +1,77 @@
+{# Barra de navegação do topo. request.resolver_match diz qual página está aberta. #}
+{% with app=request.resolver_match.app_name rota=request.resolver_match.url_name %}
+<nav class="navbar navbar-expand-lg navbar-som sticky-top">
+    <div class="container-xxl">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'musica:dashboard' %}">
+            <i class="bi bi-vinyl-fill text-som fs-3"></i> SomTeca
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                aria-controls="menu" aria-expanded="false" aria-label="Abrir menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if rota == 'dashboard' %}active{% endif %}" href="{% url 'musica:dashboard' %}">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'musica_' in rota %}active{% endif %}" href="{% url 'musica:musica_lista' %}">Músicas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'album_' in rota %}active{% endif %}" href="{% url 'musica:album_lista' %}">Álbuns</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'artista_' in rota %}active{% endif %}" href="{% url 'musica:artista_lista' %}">Artistas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app == 'playlists' %}active{% endif %}" href="{% url 'playlists:lista' %}">Playlists</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if rota == 'ranking' %}active{% endif %}" href="{% url 'musica:ranking' %}">Ranking</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link {% if rota == 'retrospectiva' %}active{% endif %}" href="{% url 'usuarios:retrospectiva' %}">Retrospectiva</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            {# Busca geral: envia ?q= para a página de busca #}
+            <form class="d-flex me-lg-3 mb-2 mb-lg-0" action="{% url 'musica:busca' %}" method="get" role="search">
+                <input class="form-control busca-topo" type="search" name="q" value="{{ request.GET.q }}"
+                       placeholder="O que você quer ouvir?" aria-label="Buscar músicas, artistas e álbuns">
+            </form>
+
+            {% if user.is_authenticated %}
+            <div class="dropdown">
+                <button class="btn btn-contorno btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'playlists:lista' %}?minhas=1"><i class="bi bi-music-note-list me-2"></i>Minhas playlists</a></li>
+                    <li><a class="dropdown-item" href="{% url 'usuarios:retrospectiva' %}"><i class="bi bi-stars me-2"></i>Minha retrospectiva</a></li>
+                    {% if user.is_staff %}
+                    <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>Administração</a></li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        {# O logout precisa ser POST (exigência do Django) #}
+                        <form action="{% url 'usuarios:logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            {% else %}
+            <div class="d-flex gap-2">
+                <a class="btn btn-link text-suave fw-semibold" href="{% url 'usuarios:cadastro' %}">Inscrever-se</a>
+                <a class="btn btn-som" href="{% url 'usuarios:login' %}">Entrar</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+{% endwith %}

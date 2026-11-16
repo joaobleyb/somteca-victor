@@ -1,0 +1,21 @@
+{% comment %}
+Card de uma música. Precisa de:
+  musica  -> a música
+  fila_id -> id do JSON da fila da página
+  indice  -> posição desta música na fila
+{% endcomment %}
+<div class="card-som">
+    <div class="capa-box">
+        {% include 'partials/capa.html' with imagem=musica.album.capa icone='music-note-beamed' alt=musica.album.titulo %}
+        <button type="button" class="btn-play-card js-tocar" data-fila="{{ fila_id }}" data-indice="{{ indice }}"
+                aria-label="Tocar {{ musica.titulo }}">
+            <i class="bi bi-play-fill"></i>
+        </button>
+    </div>
+    <a href="{{ musica.get_absolute_url }}" class="card-titulo link-card text-white">{{ musica.titulo }}</a>
+    <div class="card-sub">{{ musica.nomes_artistas }}</div>
+    <div class="card-sub small">
+        {{ musica.album.get_genero_display }} · {{ musica.duracao_formatada }} ·
+        <i class="bi bi-headphones"></i> <span data-contador-musica="{{ musica.pk }}">{{ musica.total_reproducoes }}</span>
+    </div>
+</div>

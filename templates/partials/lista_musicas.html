@@ -1,0 +1,45 @@
+{% load somteca_tags %}
+{% comment %}
+Lista de faixas no estilo "tracklist", com botão de play em cada linha.
+Parâmetros:
+  musicas       -> lista/queryset de músicas
+  fila_id       -> id do JSON com a fila (único na página)
+  ocultar_album -> True para não mostrar o nome do álbum
+Se a view anotou `plays` em cada música (ex.: plays da semana), ele é exibido;
+senão, mostra o contador geral `total_reproducoes`.
+{% endcomment %}
+{% fila_json musicas fila_id %}
+<div class="lista-faixas">
+    {% for musica in musicas %}
+    <div class="faixa" data-musica="{{ musica.pk }}">
+        <button type="button" class="btn-faixa js-tocar" data-fila="{{ fila_id }}" data-indice="{{ forloop.counter0 }}"
+                aria-label="Tocar {{ musica.titulo }}">
+            <span class="numero">{{ forloop.counter }}</span><i class="bi bi-play-fill"></i>
+        </button>
+
+        {% if musica.album.capa %}
+            <img src="{{ musica.album.capa.url }}" alt="" class="miniatura" loading="lazy">
+        {% else %}
+            <div class="miniatura capa-placeholder"><i class="bi bi-music-note"></i></div>
+        {% endif %}
+
+        <div class="info">
+            <a href="{{ musica.get_absolute_url }}" class="titulo fw-semibold">{{ musica.titulo }}</a>
+            <span class="sub">
+                {% for artista in musica.artistas.all %}<a href="{{ artista.get_absolute_url }}" class="text-suave">{{ artista.nome }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+                {% if not ocultar_album %} · <a href="{{ musica.album.get_absolute_url }}" class="text-suave">{{ musica.album.titulo }}</a>{% endif %}
+            </span>
+        </div>
+
+        <div class="extras">
+            <span class="so-desktop" title="Reproduções">
+                <i class="bi bi-headphones"></i>
+                {% if musica.plays is not None %}{{ musica.plays }}{% else %}<span data-contador-musica="{{ musica.pk }}">{{ musica.total_reproducoes }}</span>{% endif %}
+            </span>
+            <span>{{ musica.duracao_formatada }}</span>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-suave">Nenhuma música por aqui ainda.</p>
+    {% endfor %}
+</div>

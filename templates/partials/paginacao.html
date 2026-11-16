@@ -1,0 +1,26 @@
+{# Paginação. A tag {% querystring %} mantém os filtros da URL (ex.: ?genero=rock&page=2) #}
+{% if is_paginated %}
+<nav aria-label="Paginação" class="mt-4">
+    <ul class="pagination justify-content-center flex-wrap">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="{% querystring page=page_obj.previous_page_number %}" aria-label="Anterior">&laquo;</a></li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+        {% endif %}
+
+        {% for numero in paginator.page_range %}
+            {% if numero == page_obj.number %}
+            <li class="page-item active" aria-current="page"><span class="page-link">{{ numero }}</span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="{% querystring page=numero %}">{{ numero }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="{% querystring page=page_obj.next_page_number %}" aria-label="Próxima">&raquo;</a></li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

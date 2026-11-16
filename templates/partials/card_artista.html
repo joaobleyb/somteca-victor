@@ -1,0 +1,8 @@
+<div class="card-som">
+    {% include 'partials/capa.html' with imagem=artista.foto icone='person-fill' redonda=True alt=artista.nome %}
+    <a href="{{ artista.get_absolute_url }}" class="card-titulo link-card text-white">{{ artista.nome }}</a>
+    <div class="card-sub">
+        Artista · {{ artista.pais_origem }}
+        {% if artista.qtd_albuns is not None %} · {{ artista.qtd_albuns }} álbu{{ artista.qtd_albuns|pluralize:"m,ns" }}{% endif %}
+    </div>
+</div>

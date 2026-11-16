@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{# Página de confirmação usada por todas as DeleteView #}
+
+{% block titulo %}Excluir {{ object }}{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="caixa text-center p-4">
+            <i class="bi bi-exclamation-triangle-fill text-warning display-4"></i>
+            <h1 class="h3 fw-bold mt-3">Excluir {{ tipo_objeto }} "{{ object }}"?</h1>
+            <p class="text-suave">Esta ação não pode ser desfeita.</p>
+
+            {# Aviso de exclusão em cascata (definido em cada DeleteView) #}
+            {% if aviso_exclusao %}
+                <p class="text-warning small"><i class="bi bi-info-circle"></i> {{ aviso_exclusao }}</p>
+            {% endif %}
+
+            <form method="post" class="d-flex gap-2 justify-content-center mt-4">
+                {% csrf_token %}
+                <a href="{{ object.get_absolute_url }}" class="btn btn-contorno">Cancelar</a>
+                <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4">Sim, excluir</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

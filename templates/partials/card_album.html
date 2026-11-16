@@ -1,0 +1,8 @@
+<div class="card-som">
+    <div class="capa-box">
+        {% include 'partials/capa.html' with imagem=album.capa icone='disc' alt=album.titulo %}
+    </div>
+    <a href="{{ album.get_absolute_url }}" class="card-titulo link-card text-white">{{ album.titulo }}</a>
+    <div class="card-sub">{{ album.ano_lancamento }} · {{ album.artista.nome }}</div>
+    <div class="card-sub"><span class="badge rounded-pill text-bg-dark border">{{ album.get_genero_display }}</span></div>
+</div>

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load somteca_tags %}
+
+{% block titulo %}Músicas{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="fw-bold mb-0">Músicas</h1>
+    {% if user.is_authenticated %}
+    <a href="{% url 'musica:musica_criar' %}" class="btn btn-som"><i class="bi bi-plus-lg"></i> Nova música</a>
+    {% endif %}
+</div>
+
+{# Filtro por gênero (links em formato de "pílulas") #}
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item"><a class="nav-link {% if not genero_selecionado %}active{% endif %}" href="{% url 'musica:musica_lista' %}">Todos</a></li>
+    {% for valor, nome in generos %}
+    <li class="nav-item"><a class="nav-link {% if valor == genero_selecionado %}active{% endif %}" href="?genero={{ valor }}">{{ nome }}</a></li>
+    {% endfor %}
+</ul>
+
+{# Fila com as músicas desta página, para o player #}
+{% fila_json musicas 'fila-pagina' %}
+
+{% if musicas %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <button type="button" class="btn-play-grande js-tocar" data-fila="fila-pagina" data-indice="0" aria-label="Tocar todas desta página">
+        <i class="bi bi-play-fill"></i>
+    </button>
+    <span class="text-suave">{{ page_obj.paginator.count }} música{{ page_obj.paginator.count|pluralize }}</span>
+</div>
+{% endif %}
+
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3">
+    {% for musica in musicas %}
+    <div class="col">{% include 'partials/card_musica.html' with fila_id='fila-pagina' indice=forloop.counter0 %}</div>
+    {% empty %}
+    <p class="text-suave">Nenhuma música encontrada.</p>
+    {% endfor %}
+</div>
+
+{% include 'partials/paginacao.html' %}
+{% endblock %}

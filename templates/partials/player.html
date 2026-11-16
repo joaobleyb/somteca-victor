@@ -1,0 +1,42 @@
+{# Player fixo no rodapé. Todo o comportamento está em static/js/player.js #}
+<div class="player" id="player" aria-label="Player de música">
+    {# Faixa atual: capa, título e artista #}
+    <div class="faixa-atual">
+        <img id="player-capa" src="" alt="" hidden>
+        <div id="player-capa-vazia" class="capa-placeholder"><i class="bi bi-music-note"></i></div>
+        <div class="textos">
+            <a id="player-titulo" href="#" class="fw-semibold text-white">Nada tocando</a>
+            <small id="player-artista" class="text-suave">Escolha uma música para ouvir</small>
+        </div>
+    </div>
+
+    {# Controles: anterior, play/pause, próxima e barra de progresso #}
+    <div class="controles">
+        <div class="botoes">
+            <button type="button" id="player-anterior" class="btn-controle" aria-label="Anterior" disabled>
+                <i class="bi bi-skip-start-fill"></i>
+            </button>
+            <button type="button" id="player-tocar" class="btn-tocar" aria-label="Tocar" disabled>
+                <i id="player-icone-tocar" class="bi bi-play-fill"></i>
+            </button>
+            <button type="button" id="player-proxima" class="btn-controle" aria-label="Próxima" disabled>
+                <i class="bi bi-skip-end-fill"></i>
+            </button>
+        </div>
+        <div class="progresso">
+            <span id="player-tempo-atual">0:00</span>
+            <input type="range" id="player-progresso" class="barra" min="0" max="0" value="0" step="1" aria-label="Progresso da música">
+            <span id="player-tempo-total">0:00</span>
+        </div>
+    </div>
+
+    {# Volume #}
+    <div class="volume">
+        <button type="button" id="player-mudo" class="btn-controle" aria-label="Silenciar">
+            <i id="player-icone-volume" class="bi bi-volume-up"></i>
+        </button>
+        <input type="range" id="player-volume" class="barra" min="0" max="100" value="80" aria-label="Volume">
+    </div>
+
+    <audio id="player-audio" preload="metadata"></audio>
+</div>

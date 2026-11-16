@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% comment %}
+Template genérico de formulário, usado por TODAS as telas de cadastrar/editar
+(artistas, álbuns, músicas e playlists). A view envia `titulo_pagina` e `form`.
+{% endcomment %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <h1 class="fw-bold mb-4">{{ titulo_pagina }}</h1>
+
+        <div class="caixa">
+            {# enctype multipart é obrigatório para enviar arquivos (fotos, capas e mp3) #}
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors|join:" " }}</div>
+                {% endif %}
+
+                {% for campo in form %}
+                <div class="mb-3">
+                    {% if campo.widget_type == 'checkbox' %}
+                        <div class="form-check form-switch">
+                            {{ campo }}
+                            <label class="form-check-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                        </div>
+                    {% else %}
+                        <label class="form-label fw-semibold" for="{{ campo.id_for_label }}">
+                            {{ campo.label }}{% if campo.field.required %} <span class="text-som">*</span>{% endif %}
+                        </label>
+                        {{ campo }}
+                    {% endif %}
+
+                    {% if campo.help_text %}<div class="form-text">{{ campo.help_text }}</div>{% endif %}
+                    {% for erro in campo.errors %}<div class="text-danger small mt-1"><i class="bi bi-exclamation-circle"></i> {{ erro }}</div>{% endfor %}
+                </div>
+                {% endfor %}
+
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'musica:dashboard' %}{% endif %}" class="btn btn-contorno">Cancelar</a>
+                    <button type="submit" class="btn btn-som">{{ texto_botao|default:'Salvar' }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

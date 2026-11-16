@@ -1,0 +1,16 @@
+{% comment %}
+Mostra uma imagem de capa/foto ou, se não houver, um quadro com ícone.
+Parâmetros:
+  imagem  -> um ImageField (ex.: album.capa)       [opcional]
+  url     -> uma URL de imagem pronta (texto)      [opcional]
+  icone   -> ícone do Bootstrap Icons (ex.: 'disc')
+  redonda -> True para foto redonda (artistas)
+  classe  -> classes CSS extras
+{% endcomment %}
+{% if imagem %}
+    <img src="{{ imagem.url }}" alt="{{ alt }}" class="capa {{ classe }}{% if redonda %} redonda{% endif %}" loading="lazy">
+{% elif url %}
+    <img src="{{ url }}" alt="{{ alt }}" class="capa {{ classe }}{% if redonda %} redonda{% endif %}" loading="lazy">
+{% else %}
+    <div class="capa capa-placeholder {{ classe }}{% if redonda %} redonda{% endif %}"><i class="bi bi-{{ icone|default:'music-note-beamed' }}"></i></div>
+{% endif %}

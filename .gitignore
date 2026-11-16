@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Ambiente virtual
+venv/
+.venv/
+env/
+
+# Banco de dados local e uploads (são recriados com migrate + popular_banco)
+db.sqlite3
+media/
+
+# Editores / sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

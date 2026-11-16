@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load somteca_tags %}
+
+{% block titulo %}Início{% endblock %}
+
+{% block conteudo %}
+<section class="cabecalho-detalhe mb-4">
+    <span class="rotulo-tipo text-suave">
+        {{ saudacao }}{% if user.is_authenticated %}, {{ user.first_name|default:user.username }}{% endif %}
+    </span>
+    <h1 class="mb-2">Sua biblioteca de músicas</h1>
+    <p class="text-suave mb-0">Descubra artistas, monte playlists e veja o que todo mundo está ouvindo.</p>
+</section>
+
+{# Contadores gerais #}
+<section class="row g-3 mb-5">
+    <div class="col-6 col-lg-3">
+        <a href="{% url 'musica:musica_lista' %}" class="contador d-flex justify-content-between align-items-center text-white text-decoration-none">
+            <div><div class="numero">{{ total_musicas }}</div><div class="text-suave">Músicas</div></div>
+            <div class="icone"><i class="bi bi-music-note-beamed"></i></div>
+        </a>
+    </div>
+    <div class="col-6 col-lg-3">
+        <a href="{% url 'musica:artista_lista' %}" class="contador d-flex justify-content-between align-items-center text-white text-decoration-none">
+            <div><div class="numero">{{ total_artistas }}</div><div class="text-suave">Artistas</div></div>
+            <div class="icone"><i class="bi bi-mic-fill"></i></div>
+        </a>
+    </div>
+    <div class="col-6 col-lg-3">
+        <a href="{% url 'musica:album_lista' %}" class="contador d-flex justify-content-between align-items-center text-white text-decoration-none">
+            <div><div class="numero">{{ total_albuns }}</div><div class="text-suave">Álbuns</div></div>
+            <div class="icone"><i class="bi bi-disc-fill"></i></div>
+        </a>
+    </div>
+    <div class="col-6 col-lg-3">
+        <a href="{% url 'playlists:lista' %}" class="contador d-flex justify-content-between align-items-center text-white text-decoration-none">
+            <div><div class="numero">{{ total_playlists }}</div><div class="text-suave">Playlists</div></div>
+            <div class="icone"><i class="bi bi-music-note-list"></i></div>
+        </a>
+    </div>
+</section>
+
+<div class="row g-4">
+    {# Mais tocadas da semana #}
+    <section class="col-lg-5">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h4 fw-bold mb-0">Em alta nesta semana</h2>
+            <a href="{% url 'musica:ranking' %}" class="small text-suave fw-semibold">Ver ranking</a>
+        </div>
+        {% if top_semana %}
+            {% include 'partials/lista_musicas.html' with musicas=top_semana fila_id='fila-top-semana' %}
+        {% else %}
+            <p class="text-suave">Ninguém ouviu nada nos últimos 7 dias. Que tal começar agora?</p>
+        {% endif %}
+    </section>
+
+    {# Adicionadas recentemente #}
+    <section class="col-lg-7">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h4 fw-bold mb-0">Adicionadas recentemente</h2>
+            <a href="{% url 'musica:musica_lista' %}" class="small text-suave fw-semibold">Mostrar tudo</a>
+        </div>
+        {% fila_json recentes 'fila-recentes' %}
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-xl-4 g-3">
+            {% for musica in recentes %}
+            <div class="col">{% include 'partials/card_musica.html' with fila_id='fila-recentes' indice=forloop.counter0 %}</div>
+            {% empty %}
+            <p class="text-suave">Nenhuma música cadastrada. <a href="{% url 'musica:musica_criar' %}" class="text-som">Cadastre a primeira!</a></p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

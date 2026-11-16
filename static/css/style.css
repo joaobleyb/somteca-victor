@@ -1,0 +1,363 @@
+/* ==========================================================================
+   SomTeca — tema escuro inspirado no Spotify
+   O Bootstrap já está no modo escuro (data-bs-theme="dark" no <html>);
+   aqui só ajustamos cores e criamos os componentes próprios do site.
+   ========================================================================== */
+
+:root {
+    --som-verde: #1db954;
+    --som-verde-claro: #1ed760;
+    --som-fundo: #121212;
+    --som-superficie: #181818;
+    --som-superficie-2: #242424;
+    --som-borda: #2a2a2a;
+    --som-texto-suave: #b3b3b3;
+    --altura-player: 88px;
+
+    /* Sobrescreve variáveis do Bootstrap */
+    --bs-body-bg: var(--som-fundo);
+    --bs-body-color: #fff;
+    --bs-link-color-rgb: 255, 255, 255;
+    --bs-link-hover-color-rgb: 30, 215, 96;
+    --bs-border-color: var(--som-borda);
+    --bs-secondary-color: var(--som-texto-suave);
+}
+
+body {
+    background: var(--som-fundo);
+    /* Espaço no fim da página para o player fixo não cobrir o conteúdo */
+    padding-bottom: calc(var(--altura-player) + env(safe-area-inset-bottom, 0px));
+    min-height: 100vh;
+}
+
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* --------------------------------------------------------------------------
+   Botões e cores de destaque
+   -------------------------------------------------------------------------- */
+.btn-som {
+    --bs-btn-bg: var(--som-verde);
+    --bs-btn-border-color: var(--som-verde);
+    --bs-btn-color: #000;
+    --bs-btn-hover-bg: var(--som-verde-claro);
+    --bs-btn-hover-border-color: var(--som-verde-claro);
+    --bs-btn-hover-color: #000;
+    --bs-btn-active-bg: var(--som-verde);
+    --bs-btn-active-color: #000;
+    font-weight: 700;
+    border-radius: 500px;
+    padding-inline: 1.25rem;
+}
+
+.btn-contorno {
+    --bs-btn-color: #fff;
+    --bs-btn-border-color: #727272;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: transparent;
+    --bs-btn-hover-border-color: #fff;
+    border-radius: 500px;
+    font-weight: 600;
+}
+
+.text-som { color: var(--som-verde) !important; }
+.text-suave { color: var(--som-texto-suave) !important; }
+
+.nav-pills .nav-link { color: #fff; border-radius: 500px; background: var(--som-superficie-2); margin: 0 .25rem .5rem 0; }
+.nav-pills .nav-link.active { background: #fff; color: #000; }
+
+.form-control, .form-select {
+    background-color: var(--som-superficie-2);
+    border-color: var(--som-borda);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--som-verde);
+    box-shadow: 0 0 0 .2rem rgba(29, 185, 84, .25);
+}
+.form-check-input:checked { background-color: var(--som-verde); border-color: var(--som-verde); }
+
+/* --------------------------------------------------------------------------
+   Barra de navegação
+   -------------------------------------------------------------------------- */
+.navbar-som {
+    background: rgba(0, 0, 0, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--som-borda);
+}
+.navbar-som .navbar-brand { font-weight: 800; letter-spacing: -.5px; }
+.navbar-som .nav-link { color: var(--som-texto-suave); font-weight: 600; }
+.navbar-som .nav-link:hover,
+.navbar-som .nav-link.active { color: #fff; text-decoration: none; }
+.navbar-som .nav-link.active { box-shadow: inset 0 -2px 0 var(--som-verde); }
+
+.busca-topo {
+    border-radius: 500px;
+    padding-left: 2.25rem;
+    background: var(--som-superficie-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23b3b3b3' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10'/%3E%3C/svg%3E") no-repeat .85rem center;
+    min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Cabeçalho das páginas de detalhe (capa grande + título)
+   -------------------------------------------------------------------------- */
+.cabecalho-detalhe {
+    background: linear-gradient(180deg, #3a3a3a 0%, var(--som-fundo) 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+.cabecalho-detalhe .capa-grande { width: 200px; max-width: 100%; flex-shrink: 0; }
+.cabecalho-detalhe h1 { font-weight: 900; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -1px; }
+.rotulo-tipo { text-transform: uppercase; font-size: .75rem; font-weight: 700; letter-spacing: 1px; }
+
+/* --------------------------------------------------------------------------
+   Cards (artistas, álbuns, músicas, playlists)
+   -------------------------------------------------------------------------- */
+.card-som {
+    background: var(--som-superficie);
+    border: none;
+    border-radius: 10px;
+    padding: .85rem;
+    height: 100%;
+    transition: background .2s ease;
+    position: relative;
+}
+.card-som:hover { background: #282828; }
+.card-som .card-titulo {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-top: .65rem;
+}
+.card-som .card-sub {
+    color: var(--som-texto-suave);
+    font-size: .875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* Link "esticado": o card inteiro fica clicável */
+.card-som .link-card::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+
+.capa-box { position: relative; }
+.capa {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+    display: block;
+}
+.capa.redonda { border-radius: 50%; }
+.capa-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #333 0%, #1f1f1f 100%);
+    color: #6a6a6a;
+    font-size: 2.5rem;
+}
+
+/* Botão verde de play que aparece ao passar o mouse sobre o card */
+.btn-play-card {
+    position: absolute;
+    right: .5rem;
+    bottom: .5rem;
+    z-index: 2;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--som-verde);
+    color: #000;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 8px rgba(0, 0, 0, .3);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all .2s ease;
+}
+.card-som:hover .btn-play-card,
+.btn-play-card:focus-visible { opacity: 1; transform: translateY(0); }
+.btn-play-card:hover { background: var(--som-verde-claro); transform: scale(1.06); }
+@media (hover: none) {
+    /* Em celulares não existe "hover", então o botão fica sempre visível */
+    .btn-play-card { opacity: 1; transform: none; }
+}
+
+.btn-play-grande {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--som-verde);
+    color: #000;
+    font-size: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-play-grande:hover { background: var(--som-verde-claro); transform: scale(1.04); }
+
+/* --------------------------------------------------------------------------
+   Contadores do dashboard
+   -------------------------------------------------------------------------- */
+.contador {
+    background: var(--som-superficie);
+    border-radius: 12px;
+    padding: 1.25rem;
+    height: 100%;
+}
+.contador .numero { font-size: 2.25rem; font-weight: 800; line-height: 1; }
+.contador .icone {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; background: rgba(29, 185, 84, .15); color: var(--som-verde);
+}
+
+/* --------------------------------------------------------------------------
+   Lista de faixas (estilo tracklist)
+   -------------------------------------------------------------------------- */
+.lista-faixas { display: flex; flex-direction: column; }
+.faixa {
+    display: grid;
+    grid-template-columns: 40px 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .75rem;
+    padding: .45rem .75rem;
+    border-radius: 6px;
+}
+.faixa:hover { background: rgba(255, 255, 255, .08); }
+.faixa .info { min-width: 0; }
+.faixa .info .titulo,
+.faixa .info .sub {
+    display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.faixa .info .sub { color: var(--som-texto-suave); font-size: .85rem; }
+.faixa .extras { display: flex; align-items: center; gap: 1rem; color: var(--som-texto-suave); font-size: .875rem; }
+.faixa .miniatura { width: 44px; height: 44px; border-radius: 4px; object-fit: cover; }
+.faixa .miniatura.capa-placeholder { font-size: 1.1rem; }
+
+/* O número da faixa vira um botão de play ao passar o mouse */
+.btn-faixa {
+    background: none; border: none; color: var(--som-texto-suave);
+    width: 32px; height: 32px; padding: 0; position: relative;
+}
+.btn-faixa .bi { display: none; color: #fff; font-size: 1.25rem; }
+.faixa:hover .btn-faixa .numero { display: none; }
+.faixa:hover .btn-faixa .bi { display: inline; }
+
+/* Faixa que está tocando agora (classe colocada pelo player.js) */
+.faixa.tocando .titulo,
+.faixa.tocando .btn-faixa .numero { color: var(--som-verde); }
+
+/* --------------------------------------------------------------------------
+   Player fixo no rodapé
+   -------------------------------------------------------------------------- */
+.player {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 1030;
+    min-height: var(--altura-player);
+    padding: .5rem 1rem calc(.5rem + env(safe-area-inset-bottom, 0px));
+    background: #000;
+    border-top: 1px solid var(--som-borda);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+}
+.player .faixa-atual { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.player .faixa-atual img,
+.player .faixa-atual .capa-placeholder { width: 56px; height: 56px; border-radius: 4px; object-fit: cover; flex-shrink: 0; font-size: 1.4rem; }
+.player .faixa-atual .textos { min-width: 0; }
+.player .faixa-atual .textos > * { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player .controles { display: flex; flex-direction: column; align-items: center; gap: .25rem; }
+.player .botoes { display: flex; align-items: center; gap: 1rem; }
+.player .btn-controle {
+    background: none; border: none; color: var(--som-texto-suave); font-size: 1.25rem; padding: 0;
+}
+.player .btn-controle:hover:not(:disabled) { color: #fff; }
+.player .btn-controle:disabled { opacity: .4; }
+.player .btn-tocar {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: #fff; color: #000; font-size: 1.3rem;
+    display: flex; align-items: center; justify-content: center;
+}
+.player .btn-tocar:hover:not(:disabled) { transform: scale(1.06); }
+.player .btn-tocar:disabled { opacity: .5; }
+.player .progresso { display: flex; align-items: center; gap: .5rem; width: 100%; max-width: 600px; font-size: .75rem; color: var(--som-texto-suave); }
+.player .volume { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+.player .volume input { max-width: 120px; }
+
+/* Barras deslizantes (progresso e volume) */
+.barra {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right, #fff var(--preenchido, 0%), #4d4d4d var(--preenchido, 0%));
+    cursor: pointer;
+}
+.barra:hover { background: linear-gradient(to right, var(--som-verde) var(--preenchido, 0%), #4d4d4d var(--preenchido, 0%)); }
+.barra::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+.barra::-moz-range-thumb { width: 12px; height: 12px; border: none; border-radius: 50%; background: #fff; }
+
+@media (max-width: 767.98px) {
+    /* No celular: some o volume e o player fica em duas colunas */
+    .player { grid-template-columns: minmax(0, 1fr) auto; }
+    .player .volume { display: none; }
+    .player .progresso { position: absolute; top: -2px; left: 0; right: 0; max-width: none; }
+    .player .progresso span { display: none; }
+    .player .progresso .barra { height: 3px; border-radius: 0; }
+    .faixa { grid-template-columns: 32px 44px minmax(0, 1fr) auto; gap: .5rem; padding-inline: .25rem; }
+    .faixa .extras .so-desktop { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Retrospectiva (estilo "Wrapped")
+   -------------------------------------------------------------------------- */
+.wrapped-card {
+    border-radius: 20px;
+    padding: 1.75rem;
+    height: 100%;
+    color: #000;
+    position: relative;
+    overflow: hidden;
+}
+.wrapped-card h2, .wrapped-card .grande { font-weight: 900; letter-spacing: -1px; }
+.wrapped-card .grande { font-size: clamp(2.5rem, 7vw, 4.5rem); line-height: 1; }
+.wrapped-card .rotulo { font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: .8rem; opacity: .8; }
+.wrapped-card ol { padding-left: 1.4rem; margin: 0; font-weight: 700; font-size: 1.1rem; }
+.wrapped-card ol li { margin-bottom: .35rem; }
+.wrapped-card ol li small { font-weight: 500; opacity: .75; }
+.wrapped-card .decoracao {
+    position: absolute; right: -30px; bottom: -30px; font-size: 9rem; opacity: .15; line-height: 1;
+}
+.wrapped-verde { background: linear-gradient(135deg, #1ed760, #148a3c); }
+.wrapped-rosa { background: linear-gradient(135deg, #ff6ec7, #d63384); }
+.wrapped-amarelo { background: linear-gradient(135deg, #ffe066, #f5a623); }
+.wrapped-roxo { background: linear-gradient(135deg, #b388ff, #6f42c1); color: #fff; }
+.wrapped-azul { background: linear-gradient(135deg, #4facfe, #0d6efd); color: #fff; }
+.wrapped-laranja { background: linear-gradient(135deg, #ff9a5a, #e8590c); }
+.wrapped-escuro { background: var(--som-superficie); color: #fff; }
+
+/* Caixa de gráficos */
+.caixa {
+    background: var(--som-superficie);
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+/* Rodapé do site */
+.rodape { color: var(--som-texto-suave); font-size: .85rem; border-top: 1px solid var(--som-borda); }
+
+/* Paginação */
+.pagination { --bs-pagination-bg: var(--som-superficie); --bs-pagination-active-bg: var(--som-verde); --bs-pagination-active-border-color: var(--som-verde); --bs-pagination-active-color: #000; --bs-pagination-color: #fff; }
+
+/* Área dos gráficos do Chart.js (precisa de altura fixa) */
+.grafico-box { position: relative; height: 340px; }

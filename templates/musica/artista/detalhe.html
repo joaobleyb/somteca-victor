@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block titulo %}{{ artista.nome }}{% endblock %}
+
+{% block conteudo %}
+<section class="cabecalho-detalhe d-flex flex-column flex-md-row align-items-md-end gap-4 mb-4">
+    <div class="capa-grande">
+        {% include 'partials/capa.html' with imagem=artista.foto icone='person-fill' redonda=True alt=artista.nome %}
+    </div>
+    <div class="flex-grow-1">
+        <span class="rotulo-tipo">Artista</span>
+        <h1 class="mb-2">{{ artista.nome }}</h1>
+        <p class="text-suave mb-0">
+            <i class="bi bi-geo-alt"></i> {{ artista.pais_origem }} ·
+            {{ albuns|length }} álbu{{ albuns|length|pluralize:"m,ns" }} ·
+            {{ musicas|length }} música{{ musicas|length|pluralize }}
+        </p>
+    </div>
+</section>
+
+<div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+    {% if musicas %}
+    <button type="button" class="btn-play-grande js-tocar" data-fila="fila-artista" data-indice="0" aria-label="Tocar músicas de {{ artista.nome }}">
+        <i class="bi bi-play-fill"></i>
+    </button>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <a href="{% url 'musica:artista_editar' artista.pk %}" class="btn btn-contorno"><i class="bi bi-pencil"></i> Editar</a>
+    <a href="{% url 'musica:album_criar' %}?artista={{ artista.pk }}" class="btn btn-contorno"><i class="bi bi-plus-lg"></i> Novo álbum</a>
+    <a href="{% url 'musica:artista_excluir' artista.pk %}" class="btn btn-outline-danger rounded-pill"><i class="bi bi-trash"></i> Excluir</a>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <section class="col-lg-8">
+        <h2 class="h4 fw-bold mb-2">Populares</h2>
+        {% include 'partials/lista_musicas.html' with fila_id='fila-artista' %}
+    </section>
+
+    <section class="col-lg-4">
+        <h2 class="h4 fw-bold mb-2">Sobre</h2>
+        <div class="caixa">
+            {% if artista.biografia %}
+                <p class="mb-0" style="white-space: pre-line">{{ artista.biografia }}</p>
+            {% else %}
+                <p class="text-suave mb-0">Este artista ainda não tem biografia.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<section class="mt-5">
+    <h2 class="h4 fw-bold mb-3">Discografia</h2>
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3">
+        {% for album in albuns %}
+        <div class="col">{% include 'partials/card_album.html' %}</div>
+        {% empty %}
+        <p class="text-suave">Nenhum álbum cadastrado para este artista.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

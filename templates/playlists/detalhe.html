@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load somteca_tags %}
+
+{% block titulo %}{{ playlist.nome }}{% endblock %}
+
+{% block conteudo %}
+<section class="cabecalho-detalhe d-flex flex-column flex-md-row align-items-md-end gap-4 mb-4">
+    <div class="capa-grande">
+        {% include 'partials/capa.html' with url=playlist.capa_url icone='music-note-list' alt=playlist.nome %}
+    </div>
+    <div class="flex-grow-1">
+        <span class="rotulo-tipo">
+            {% if playlist.publica %}Playlist pública{% else %}<i class="bi bi-lock-fill"></i> Playlist privada{% endif %}
+        </span>
+        <h1 class="mb-2">{{ playlist.nome }}</h1>
+        {% if playlist.descricao %}<p class="text-suave mb-2">{{ playlist.descricao }}</p>{% endif %}
+        <p class="mb-0">
+            <span class="fw-bold">{{ playlist.usuario.first_name|default:playlist.usuario.username }}</span>
+            <span class="text-suave">· {{ itens|length }} música{{ itens|length|pluralize }}, {{ duracao_total|minutos }} min</span>
+        </p>
+    </div>
+</section>
+
+<div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+    {% if itens %}
+    <button type="button" class="btn-play-grande js-tocar" data-fila="fila-playlist" data-indice="0" aria-label="Tocar a playlist">
+        <i class="bi bi-play-fill"></i>
+    </button>
+    {% endif %}
+    {% if eh_dono %}
+    <a href="{% url 'playlists:editar' playlist.pk %}" class="btn btn-contorno"><i class="bi bi-pencil"></i> Editar</a>
+    <a href="{% url 'playlists:excluir' playlist.pk %}" class="btn btn-outline-danger rounded-pill"><i class="bi bi-trash"></i> Excluir</a>
+    {% endif %}
+</div>
+
+{# Só o dono vê o formulário para adicionar músicas #}
+{% if eh_dono %}
+<form method="post" action="{% url 'playlists:adicionar_musica' playlist.pk %}" class="caixa d-flex flex-wrap gap-2 align-items-center mb-4">
+    {% csrf_token %}
+    <label for="{{ form_adicionar.musica.id_for_label }}" class="fw-semibold me-2"><i class="bi bi-plus-circle text-som"></i> Adicionar música</label>
+    <div class="flex-grow-1" style="min-width: 12rem">{{ form_adicionar.musica }}</div>
+    <button type="submit" class="btn btn-som">Adicionar</button>
+</form>
+{% endif %}
+
+{% fila_json musicas 'fila-playlist' %}
+<div class="lista-faixas">
+    {% for item in itens %}
+    {% with musica=item.musica %}
+    <div class="faixa" data-musica="{{ musica.pk }}">
+        <button type="button" class="btn-faixa js-tocar" data-fila="fila-playlist" data-indice="{{ forloop.counter0 }}" aria-label="Tocar {{ musica.titulo }}">
+            <span class="numero">{{ forloop.counter }}</span><i class="bi bi-play-fill"></i>
+        </button>
+        {% if musica.album.capa %}
+            <img src="{{ musica.album.capa.url }}" alt="" class="miniatura" loading="lazy">
+        {% else %}
+            <div class="miniatura capa-placeholder"><i class="bi bi-music-note"></i></div>
+        {% endif %}
+        <div class="info">
+            <a href="{{ musica.get_absolute_url }}" class="titulo fw-semibold">{{ musica.titulo }}</a>
+            <span class="sub">{{ musica.nomes_artistas }} · adicionada em {{ item.adicionada_em|date:"d/m/Y" }}</span>
+        </div>
+        <div class="extras">
+            <span class="so-desktop">{{ musica.duracao_formatada }}</span>
+            {% if eh_dono %}
+            {# Botões para mudar a ordem e remover (cada um é um pequeno formulário POST) #}
+            <div class="btn-group btn-group-sm">
+                <form method="post" action="{% url 'playlists:mover_item' playlist.pk item.pk 'subir' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-link text-suave p-1" {% if forloop.first %}disabled{% endif %} aria-label="Subir"><i class="bi bi-arrow-up"></i></button>
+                </form>
+                <form method="post" action="{% url 'playlists:mover_item' playlist.pk item.pk 'descer' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-link text-suave p-1" {% if forloop.last %}disabled{% endif %} aria-label="Descer"><i class="bi bi-arrow-down"></i></button>
+                </form>
+                <form method="post" action="{% url 'playlists:remover_item' playlist.pk item.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-link text-danger p-1" aria-label="Remover da playlist"><i class="bi bi-x-lg"></i></button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endwith %}
+    {% empty %}
+    <p class="text-suave">Esta playlist ainda está vazia.{% if eh_dono %} Use o campo acima para adicionar músicas.{% endif %}</p>
+    {% endfor %}
+</div>
+{% endblock %}
