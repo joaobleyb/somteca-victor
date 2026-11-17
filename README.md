@@ -79,9 +79,17 @@ O comando cria:
 
 Opções: `--limpar` apaga o catálogo antes de popular, e `--reproducoes 10000` muda a quantidade de reproduções.
 
-> As músicas de exemplo usam um MP3 **silencioso** de 10 segundos gerado pelo próprio comando, porque não podemos distribuir músicas reais. Para ouvir algo de verdade, cadastre uma música e envie um arquivo `.mp3` seu.
+> As músicas de exemplo usam um MP3 **silencioso** de 10 segundos gerado pelo próprio comando. Para ter músicas que tocam de verdade, veja o próximo passo.
 
-### 7. Iniciar o servidor
+### 7. (Opcional) Baixar 30 músicas reais com licença livre
+```bash
+python manage.py importar_musicas_reais
+```
+Baixa ~210 MB de MP3 (precisa de internet) e cadastra **30 faixas reais de Kevin MacLeod** em 6 coletâneas: *Lounge & Jazz*, *Diversão Garantida*, *Pixels & Sintetizadores*, *Groove*, *Adrenalina* e *Clássicos Revisitados*. Também cria a playlist pública "Músicas Reais (CC BY)" e 800 reproduções para essas faixas aparecerem no ranking (use `--reproducoes 0` para não criar).
+
+A duração de cada faixa é calculada lendo o cabeçalho do próprio MP3 (função `duracao_mp3`, sem biblioteca extra). Os arquivos ficam em `media/` e não vão para o Git. Rodar o comando de novo não baixa tudo outra vez.
+
+### 8. Iniciar o servidor
 ```bash
 python manage.py runserver
 ```
@@ -158,6 +166,15 @@ erDiagram
 - **Ranking e retrospectiva** usam `annotate(Count(...))` com `filter=Q(...)`, `Sum` e `ExtractMonth`, então toda a agregação é feita pelo banco de dados.
 - **Permissões das playlists:** `LoginRequiredMixin` + `UserPassesTestMixin` (`DonoPlaylistMixin`). Playlists privadas de outros usuários retornam 404.
 - **Duração em mm:ss:** o formulário aceita "3:45" e converte para 225 segundos em `clean_duracao`.
+
+## 🎼 Créditos das músicas
+
+As 30 faixas baixadas por `importar_musicas_reais` são de **Kevin MacLeod ([incompetech.com](https://incompetech.com))**, licenciadas sob **Creative Commons: By Attribution 4.0**
+([creativecommons.org/licenses/by/4.0](https://creativecommons.org/licenses/by/4.0/)).
+
+Faixas: Airport Lounge, Backbay Lounge, Bossa Antigua, Night on the Docks (Sax), Smooth Lovin, Monkeys Spinning Monkeys, Fluffing a Duck, Sneaky Snitch, Scheming Weasel (faster), Pixel Peeker Polka (faster), Spazzmatica Polka, Life of Riley, Itty Bitty 8 Bit, Hyperfun, Blip Stream, Chill Wave, Aitech, Ouroboros, Funkorama, Groove Grove, Cool Vibes, Rollin at 5, Easy Lemon, Killers, Volatile Reaction, Cut and Run, Furious Freak, Hitman, Gymnopedie No 1, Danse Macabre.
+
+As coletâneas (nomes e capas) foram montadas para este projeto e não são álbuns oficiais do artista. Os demais artistas e músicas do `popular_banco` são fictícios.
 
 ## ⚠️ Limitações conhecidas
 
