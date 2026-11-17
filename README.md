@@ -36,8 +36,8 @@
 
 ### 1. Clonar o projeto
 ```bash
-git clone https://github.com/joaobleyb/somteca.git
-cd somteca
+git clone https://github.com/joaobleyb/somteca-victor.git
+cd somteca-victor
 ```
 
 ### 2. Criar e ativar o ambiente virtual
