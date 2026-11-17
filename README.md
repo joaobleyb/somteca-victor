@@ -67,29 +67,23 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### 6. (Opcional, recomendado) Popular o banco com dados de exemplo
+### 6. (Opcional, recomendado) Popular o banco com músicas reais e dados de exemplo
 ```bash
 python manage.py popular_banco
 ```
-O comando cria:
-- 8 artistas fictícios, 11 álbuns (com capas geradas automaticamente) e 47 músicas, algumas com participações;
+O comando precisa de internet e baixa cerca de 210 MB. Ele cria:
+- **30 músicas reais de Kevin MacLeod** (licença livre CC BY 4.0, veja os [créditos](#-créditos-das-músicas)) em 6 coletâneas com capas geradas automaticamente: *Lounge & Jazz*, *Diversão Garantida*, *Pixels & Sintetizadores*, *Groove*, *Adrenalina* e *Clássicos Revisitados*;
 - 4 usuários: `demo`, `ana`, `bruno` e `carla`, todos com a senha **`somteca123`**;
-- playlists públicas e privadas;
+- playlists públicas e privadas, incluindo "Músicas Reais (CC BY)" com as 30 faixas;
 - 4.000 reproduções espalhadas pelos últimos 14 meses, para o ranking e a retrospectiva terem conteúdo.
 
 Opções: `--limpar` apaga o catálogo antes de popular, e `--reproducoes 10000` muda a quantidade de reproduções.
 
-> As músicas de exemplo usam um MP3 **silencioso** de 10 segundos gerado pelo próprio comando. Para ter músicas que tocam de verdade, veja o próximo passo.
+Os MP3 ficam em `media/` e não vão para o Git. Rodar o comando de novo não baixa tudo outra vez. A duração de cada faixa é calculada lendo o cabeçalho do próprio MP3 (função `duracao_mp3`, sem biblioteca extra).
 
-### 7. (Opcional) Baixar 30 músicas reais com licença livre
-```bash
-python manage.py importar_musicas_reais
-```
-Baixa ~210 MB de MP3 (precisa de internet) e cadastra **30 faixas reais de Kevin MacLeod** em 6 coletâneas: *Lounge & Jazz*, *Diversão Garantida*, *Pixels & Sintetizadores*, *Groove*, *Adrenalina* e *Clássicos Revisitados*. Também cria a playlist pública "Músicas Reais (CC BY)" e 800 reproduções para essas faixas aparecerem no ranking (use `--reproducoes 0` para não criar).
+> Só quer as músicas, sem usuários nem playlists de teste? Use `python manage.py importar_musicas_reais`.
 
-A duração de cada faixa é calculada lendo o cabeçalho do próprio MP3 (função `duracao_mp3`, sem biblioteca extra). Os arquivos ficam em `media/` e não vão para o Git. Rodar o comando de novo não baixa tudo outra vez.
-
-### 8. Iniciar o servidor
+### 7. Iniciar o servidor
 ```bash
 python manage.py runserver
 ```
@@ -169,12 +163,12 @@ erDiagram
 
 ## 🎼 Créditos das músicas
 
-As 30 faixas baixadas por `importar_musicas_reais` são de **Kevin MacLeod ([incompetech.com](https://incompetech.com))**, licenciadas sob **Creative Commons: By Attribution 4.0**
+As 30 faixas baixadas por `popular_banco` / `importar_musicas_reais` são de **Kevin MacLeod ([incompetech.com](https://incompetech.com))**, licenciadas sob **Creative Commons: By Attribution 4.0**
 ([creativecommons.org/licenses/by/4.0](https://creativecommons.org/licenses/by/4.0/)).
 
 Faixas: Airport Lounge, Backbay Lounge, Bossa Antigua, Night on the Docks (Sax), Smooth Lovin, Monkeys Spinning Monkeys, Fluffing a Duck, Sneaky Snitch, Scheming Weasel (faster), Pixel Peeker Polka (faster), Spazzmatica Polka, Life of Riley, Itty Bitty 8 Bit, Hyperfun, Blip Stream, Chill Wave, Aitech, Ouroboros, Funkorama, Groove Grove, Cool Vibes, Rollin at 5, Easy Lemon, Killers, Volatile Reaction, Cut and Run, Furious Freak, Hitman, Gymnopedie No 1, Danse Macabre.
 
-As coletâneas (nomes e capas) foram montadas para este projeto e não são álbuns oficiais do artista. Os demais artistas e músicas do `popular_banco` são fictícios.
+As coletâneas (nomes e capas) foram montadas para este projeto e não são álbuns oficiais do artista.
 
 ## ⚠️ Limitações conhecidas
 
