@@ -18,7 +18,7 @@
 
             <form method="post" class="d-flex gap-2 justify-content-center mt-4">
                 {% csrf_token %}
-                <a href="{{ object.get_absolute_url }}" class="btn btn-contorno">Cancelar</a>
+                <a href="{{ url_next|default:object.get_absolute_url }}" class="btn btn-contorno">Cancelar</a>
                 <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4">Sim, excluir</button>
             </form>
         </div>

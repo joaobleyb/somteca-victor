@@ -6,7 +6,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from ..forms import MusicaForm
 from ..models import GENEROS, Album, Musica
-from .mixins import ExclusaoMixin, FormularioMixin
+from .mixins import ExclusaoMixin, FormularioMixin, VoltarParaNextMixin
 
 
 class MusicaListView(ListView):
@@ -58,7 +58,7 @@ class MusicaDetailView(DetailView):
         return contexto
 
 
-class MusicaCreateView(LoginRequiredMixin, FormularioMixin, CreateView):
+class MusicaCreateView(LoginRequiredMixin, VoltarParaNextMixin, FormularioMixin, CreateView):
     model = Musica
     form_class = MusicaForm
     titulo_pagina = 'Cadastrar música'
@@ -77,14 +77,14 @@ class MusicaCreateView(LoginRequiredMixin, FormularioMixin, CreateView):
         return inicial
 
 
-class MusicaUpdateView(LoginRequiredMixin, FormularioMixin, UpdateView):
+class MusicaUpdateView(LoginRequiredMixin, VoltarParaNextMixin, FormularioMixin, UpdateView):
     model = Musica
     form_class = MusicaForm
     titulo_pagina = 'Editar música'
     success_message = 'Música "%(objeto)s" atualizada com sucesso!'
 
 
-class MusicaDeleteView(LoginRequiredMixin, ExclusaoMixin, DeleteView):
+class MusicaDeleteView(LoginRequiredMixin, VoltarParaNextMixin, ExclusaoMixin, DeleteView):
     model = Musica
     tipo_objeto = 'a música'
     success_url = reverse_lazy('musica:musica_lista')

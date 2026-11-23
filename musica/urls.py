@@ -30,6 +30,9 @@ urlpatterns = [
     path('musicas/<int:pk>/editar/', views.MusicaUpdateView.as_view(), name='musica_editar'),
     path('musicas/<int:pk>/excluir/', views.MusicaDeleteView.as_view(), name='musica_excluir'),
 
+    # Painel do gestor (só equipe)
+    path('gestor/', views.PainelGestorView.as_view(), name='gestor'),
+
     # Extras
     path('ranking/', views.RankingView.as_view(), name='ranking'),
     path('busca/', views.BuscaView.as_view(), name='busca'),

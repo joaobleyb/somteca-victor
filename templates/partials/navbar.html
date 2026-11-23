@@ -36,6 +36,11 @@
                     <a class="nav-link {% if rota == 'retrospectiva' %}active{% endif %}" href="{% url 'usuarios:retrospectiva' %}">Retrospectiva</a>
                 </li>
                 {% endif %}
+                {% if user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link {% if rota == 'gestor' %}active{% endif %}" href="{% url 'musica:gestor' %}"><i class="bi bi-speedometer2"></i> Gestor</a>
+                </li>
+                {% endif %}
             </ul>
 
             {# Busca geral: envia ?q= para a página de busca #}
@@ -53,6 +58,7 @@
                     <li><a class="dropdown-item" href="{% url 'playlists:lista' %}?minhas=1"><i class="bi bi-music-note-list me-2"></i>Minhas playlists</a></li>
                     <li><a class="dropdown-item" href="{% url 'usuarios:retrospectiva' %}"><i class="bi bi-stars me-2"></i>Minha retrospectiva</a></li>
                     {% if user.is_staff %}
+                    <li><a class="dropdown-item" href="{% url 'musica:gestor' %}"><i class="bi bi-speedometer2 me-2"></i>Painel do gestor</a></li>
                     <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>Administração</a></li>
                     {% endif %}
                     <li><hr class="dropdown-divider"></li>

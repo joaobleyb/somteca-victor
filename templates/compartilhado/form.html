@@ -40,7 +40,7 @@ Template genérico de formulário, usado por TODAS as telas de cadastrar/editar
                 {% endfor %}
 
                 <div class="d-flex gap-2 justify-content-end mt-4">
-                    <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'musica:dashboard' %}{% endif %}" class="btn btn-contorno">Cancelar</a>
+                    <a href="{% if url_next %}{{ url_next }}{% elif object %}{{ object.get_absolute_url }}{% else %}{% url 'musica:dashboard' %}{% endif %}" class="btn btn-contorno">Cancelar</a>
                     <button type="submit" class="btn btn-som">{{ texto_botao|default:'Salvar' }}</button>
                 </div>
             </form>

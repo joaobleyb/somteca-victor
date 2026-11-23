@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% comment %}
+Painel do gestor: tabela com todas as músicas e botões para adicionar,
+editar e remover. Só usuários da equipe (is_staff) acessam.
+{% endcomment %}
+
+{% block titulo %}Painel do gestor{% endblock %}
+
+{% block conteudo %}
+{% url 'musica:gestor' as url_painel %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <p class="rotulo-tipo text-suave mb-1"><i class="bi bi-shield-lock"></i> Área do gestor</p>
+        <h1 class="fw-bold mb-0">Painel do gestor</h1>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'musica:artista_criar' %}" class="btn btn-contorno"><i class="bi bi-person-plus"></i> Novo artista</a>
+        <a href="{% url 'musica:album_criar' %}" class="btn btn-contorno"><i class="bi bi-disc"></i> Novo álbum</a>
+        <a href="{% url 'musica:musica_criar' %}?next={{ url_painel|urlencode }}" class="btn btn-som"><i class="bi bi-plus-lg"></i> Adicionar música</a>
+    </div>
+</div>
+
+{# Contadores #}
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+    <div class="col"><div class="caixa py-3"><div class="text-suave small">Músicas</div><div class="fs-3 fw-bold">{{ total_musicas }}</div></div></div>
+    <div class="col"><div class="caixa py-3"><div class="text-suave small">Álbuns</div><div class="fs-3 fw-bold">{{ total_albuns }}</div></div></div>
+    <div class="col"><div class="caixa py-3"><div class="text-suave small">Artistas</div><div class="fs-3 fw-bold">{{ total_artistas }}</div></div></div>
+    <div class="col"><div class="caixa py-3"><div class="text-suave small">Reproduções</div><div class="fs-3 fw-bold">{{ total_reproducoes }}</div></div></div>
+</div>
+
+<div class="caixa">
+    {# Busca dentro do painel #}
+    <form method="get" class="d-flex flex-wrap gap-2 mb-3" role="search">
+        <input type="search" name="q" value="{{ termo }}" class="form-control flex-grow-1" style="max-width: 420px"
+               placeholder="Buscar por título, álbum ou artista" aria-label="Buscar músicas no painel">
+        <button type="submit" class="btn btn-contorno"><i class="bi bi-search"></i> Buscar</button>
+        {% if termo %}<a href="{{ url_painel }}" class="btn btn-link text-suave">Limpar</a>{% endif %}
+    </form>
+
+    <p class="text-suave small mb-2">{{ page_obj.paginator.count }} música{{ page_obj.paginator.count|pluralize }}{% if termo %} para "{{ termo }}"{% endif %}</p>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th class="d-none d-md-table-cell">Artistas</th>
+                    <th class="d-none d-lg-table-cell">Álbum</th>
+                    <th class="text-end d-none d-sm-table-cell">Duração</th>
+                    <th class="text-end d-none d-sm-table-cell">Plays</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for musica in musicas %}
+                <tr>
+                    <td><a href="{{ musica.get_absolute_url }}" class="link-light fw-semibold text-decoration-none">{{ musica.titulo }}</a></td>
+                    <td class="d-none d-md-table-cell text-suave">{{ musica.nomes_artistas }}</td>
+                    <td class="d-none d-lg-table-cell text-suave">{{ musica.album.titulo }}</td>
+                    <td class="text-end d-none d-sm-table-cell text-suave">{{ musica.duracao_formatada }}</td>
+                    <td class="text-end d-none d-sm-table-cell text-suave">{{ musica.total_reproducoes }}</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'musica:musica_editar' musica.pk %}?next={{ request.get_full_path|urlencode }}"
+                           class="btn btn-sm btn-contorno" title="Editar"><i class="bi bi-pencil"></i><span class="d-none d-xl-inline"> Editar</span></a>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill js-remover"
+                                data-bs-toggle="modal" data-bs-target="#modal-remover"
+                                data-titulo="{{ musica.titulo }}"
+                                data-url="{% url 'musica:musica_excluir' musica.pk %}" title="Remover">
+                            <i class="bi bi-trash"></i><span class="d-none d-xl-inline"> Remover</span>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-suave text-center py-4">Nenhuma música encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'partials/paginacao.html' %}
+
+{# Janela de confirmação da remoção #}
+<div class="modal fade" id="modal-remover" tabindex="-1" aria-labelledby="modal-remover-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" class="modal-content" id="form-remover">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="modal-remover-titulo"><i class="bi bi-exclamation-triangle-fill text-warning"></i> Remover música</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Remover <strong id="remover-titulo"></strong>? O histórico de reproduções dela também será apagado. Esta ação não pode ser desfeita.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-contorno" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4">Sim, remover</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Preenche a janela de confirmação com a música clicada
+    document.getElementById('modal-remover').addEventListener('show.bs.modal', function (evento) {
+        const botao = evento.relatedTarget;
+        document.getElementById('remover-titulo').textContent = '"' + botao.dataset.titulo + '"';
+        document.getElementById('form-remover').action = botao.dataset.url;
+    });
+</script>
+{% endblock %}

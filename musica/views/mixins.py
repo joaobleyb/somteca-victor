@@ -45,3 +45,29 @@ class ExclusaoMixin(SuccessMessageMixin):
 
     def get_success_message(self, cleaned_data):
         return self.success_message % {'objeto': self.object}
+
+
+class VoltarParaNextMixin:
+    """
+    Se a URL (ou o formulário) trouxer ?next=/algum/lugar/, volta para lá depois
+    de salvar/excluir. Usado pelo painel do gestor para retornar ao painel.
+    Só aceita endereços do próprio site, por segurança.
+    """
+
+    def _url_next(self):
+        from django.utils.http import url_has_allowed_host_and_scheme
+
+        destino = self.request.POST.get('next') or self.request.GET.get('next')
+        if destino and url_has_allowed_host_and_scheme(
+            destino, allowed_hosts={self.request.get_host()}, require_https=self.request.is_secure(),
+        ):
+            return destino
+        return None
+
+    def get_success_url(self):
+        return self._url_next() or super().get_success_url()
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['url_next'] = self._url_next()
+        return contexto
