@@ -1,0 +1,23 @@
+{# Uma linha da tabela "Aguardando aprovação" do painel do gestor #}
+<tr>
+    <td class="text-nowrap"><i class="bi {{ icone }} text-suave"></i> {{ rotulo }}</td>
+    <td>
+        <a href="{{ item.get_absolute_url }}" class="link-light fw-semibold text-decoration-none">{{ item }}</a>
+        {% if detalhe %}<div class="small text-suave">{{ detalhe }}</div>{% endif %}
+    </td>
+    <td class="d-none d-md-table-cell text-suave">{{ item.enviado_por.username|default:'—' }}</td>
+    <td class="d-none d-lg-table-cell text-suave">{{ item.data_criacao|date:'d/m/Y H:i' }}</td>
+    <td class="text-end text-nowrap">
+        <form method="post" action="{% url 'musica:aprovar' tipo item.pk %}" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn btn-sm btn-som" title="Aprovar"><i class="bi bi-check-lg"></i> Aprovar</button>
+        </form>
+        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill"
+                data-bs-toggle="modal" data-bs-target="#modal-remover"
+                data-titulo="{{ item }}" data-acao="Recusar" data-tipo="{{ rotulo|lower }}"
+                data-url="{{ url_recusar }}" title="Recusar">
+            <i class="bi bi-x-lg"></i> Recusar
+        </button>
+    </td>
+</tr>

@@ -7,7 +7,7 @@ class Reproducao(models.Model):
     """
     Registra cada vez que uma música é tocada no player.
 
-    É a base do ranking de mais ouvidas e da retrospectiva do ano.
+    É usada para mostrar as mais tocadas da semana no início.
     """
 
     # Pode ser nulo para registrar reproduções de visitantes não logados

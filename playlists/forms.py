@@ -18,7 +18,7 @@ class PlaylistForm(BootstrapFormMixin, forms.ModelForm):
 
     musicas = forms.ModelMultipleChoiceField(
         label='Músicas',
-        queryset=Musica.objects.select_related('album').order_by('titulo'),
+        queryset=Musica.objects.aprovados().select_related('album').order_by('titulo'),
         required=False,
         widget=forms.SelectMultiple(attrs={'size': 10}),
         help_text='Segure Ctrl (ou Cmd) para escolher várias. Você também pode '
@@ -47,7 +47,7 @@ class AdicionarMusicaForm(BootstrapFormMixin, forms.Form):
 
     musica = forms.ModelChoiceField(
         label='Adicionar música',
-        queryset=Musica.objects.select_related('album').order_by('titulo'),
+        queryset=Musica.objects.aprovados().select_related('album').order_by('titulo'),
         empty_label='Escolha uma música...',
     )
 

@@ -318,35 +318,7 @@ a:hover { text-decoration: underline; }
     .faixa .extras .so-desktop { display: none; }
 }
 
-/* --------------------------------------------------------------------------
-   Retrospectiva (estilo "Wrapped")
-   -------------------------------------------------------------------------- */
-.wrapped-card {
-    border-radius: 20px;
-    padding: 1.75rem;
-    height: 100%;
-    color: #000;
-    position: relative;
-    overflow: hidden;
-}
-.wrapped-card h2, .wrapped-card .grande { font-weight: 900; letter-spacing: -1px; }
-.wrapped-card .grande { font-size: clamp(2.5rem, 7vw, 4.5rem); line-height: 1; }
-.wrapped-card .rotulo { font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: .8rem; opacity: .8; }
-.wrapped-card ol { padding-left: 1.4rem; margin: 0; font-weight: 700; font-size: 1.1rem; }
-.wrapped-card ol li { margin-bottom: .35rem; }
-.wrapped-card ol li small { font-weight: 500; opacity: .75; }
-.wrapped-card .decoracao {
-    position: absolute; right: -30px; bottom: -30px; font-size: 9rem; opacity: .15; line-height: 1;
-}
-.wrapped-verde { background: linear-gradient(135deg, #1ed760, #148a3c); }
-.wrapped-rosa { background: linear-gradient(135deg, #ff6ec7, #d63384); }
-.wrapped-amarelo { background: linear-gradient(135deg, #ffe066, #f5a623); }
-.wrapped-roxo { background: linear-gradient(135deg, #b388ff, #6f42c1); color: #fff; }
-.wrapped-azul { background: linear-gradient(135deg, #4facfe, #0d6efd); color: #fff; }
-.wrapped-laranja { background: linear-gradient(135deg, #ff9a5a, #e8590c); }
-.wrapped-escuro { background: var(--som-superficie); color: #fff; }
-
-/* Caixa de gráficos */
+/* Caixa de conteúdo */
 .caixa {
     background: var(--som-superficie);
     border-radius: 12px;
@@ -359,5 +331,3 @@ a:hover { text-decoration: underline; }
 /* Paginação */
 .pagination { --bs-pagination-bg: var(--som-superficie); --bs-pagination-active-bg: var(--som-verde); --bs-pagination-active-border-color: var(--som-verde); --bs-pagination-active-color: #000; --bs-pagination-color: #fff; }
 
-/* Área dos gráficos do Chart.js (precisa de altura fixa) */
-.grafico-box { position: relative; height: 340px; }

@@ -3,6 +3,16 @@
 {% block titulo %}{{ artista.nome }}{% endblock %}
 
 {% block conteudo %}
+{% if not artista.aprovado %}
+<div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <span><i class="bi bi-hourglass-split"></i> Este artista está <strong>aguardando aprovação</strong> e ainda não aparece no site.</span>
+    <form method="post" action="{% url 'musica:aprovar' 'artista' artista.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-som btn-sm"><i class="bi bi-check-lg"></i> Aprovar</button>
+    </form>
+</div>
+{% endif %}
 <section class="cabecalho-detalhe d-flex flex-column flex-md-row align-items-md-end gap-4 mb-4">
     <div class="capa-grande">
         {% include 'partials/capa.html' with imagem=artista.foto icone='person-fill' redonda=True alt=artista.nome %}
@@ -25,9 +35,13 @@
     </button>
     {% endif %}
     {% if user.is_authenticated %}
+    {% if user.is_staff %}
     <a href="{% url 'musica:artista_editar' artista.pk %}" class="btn btn-contorno"><i class="bi bi-pencil"></i> Editar</a>
+    {% endif %}
     <a href="{% url 'musica:album_criar' %}?artista={{ artista.pk }}" class="btn btn-contorno"><i class="bi bi-plus-lg"></i> Novo álbum</a>
+    {% if user.is_staff %}
     <a href="{% url 'musica:artista_excluir' artista.pk %}" class="btn btn-outline-danger rounded-pill"><i class="bi bi-trash"></i> Excluir</a>
+    {% endif %}
     {% endif %}
 </div>
 

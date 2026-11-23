@@ -45,7 +45,6 @@
     <section class="col-lg-5">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h2 class="h4 fw-bold mb-0">Em alta nesta semana</h2>
-            <a href="{% url 'musica:ranking' %}" class="small text-suave fw-semibold">Ver ranking</a>
         </div>
         {% if top_semana %}
             {% include 'partials/lista_musicas.html' with musicas=top_semana fila_id='fila-top-semana' %}

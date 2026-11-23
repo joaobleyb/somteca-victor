@@ -21,7 +21,7 @@ class BuscaView(TemplateView):
 
         if termo:
             contexto['musicas'] = (
-                Musica.objects
+                Musica.objects.aprovados()
                 .filter(
                     Q(titulo__icontains=termo)
                     | Q(artistas__nome__icontains=termo)
@@ -31,11 +31,11 @@ class BuscaView(TemplateView):
                 .prefetch_related('artistas')
                 .distinct()  # evita repetir músicas que casam por mais de um artista
             )
-            contexto['artistas'] = Artista.objects.filter(
+            contexto['artistas'] = Artista.objects.aprovados().filter(
                 Q(nome__icontains=termo) | Q(pais_origem__icontains=termo)
             )
             contexto['albuns'] = (
-                Album.objects
+                Album.objects.aprovados()
                 .filter(Q(titulo__icontains=termo) | Q(artista__nome__icontains=termo))
                 .select_related('artista')
             )

@@ -2,6 +2,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 
+from .aprovacao import AlbumQuerySet, AprovacaoMixin
+
 # Lista de gêneros musicais disponíveis (valor salvo no banco, texto exibido)
 GENEROS = [
     ('rock', 'Rock'),
@@ -20,7 +22,7 @@ GENEROS = [
 ]
 
 
-class Album(models.Model):
+class Album(AprovacaoMixin):
     """Um álbum pertence a um artista principal e contém várias músicas."""
 
     titulo = models.CharField('título', max_length=150)
@@ -38,6 +40,8 @@ class Album(models.Model):
     capa = models.ImageField('capa', upload_to='capas/', blank=True)
     genero = models.CharField('gênero', max_length=20, choices=GENEROS)
     data_criacao = models.DateTimeField('data de criação', auto_now_add=True)
+
+    objects = AlbumQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'álbum'

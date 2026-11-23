@@ -4,6 +4,12 @@ from django.contrib import admin
 from .models import Album, Artista, Musica, Reproducao
 
 
+@admin.action(description='Aprovar os itens selecionados')
+def aprovar_selecionados(modeladmin, request, queryset):
+    total = queryset.update(aprovado=True)
+    modeladmin.message_user(request, f'{total} item(ns) aprovado(s).')
+
+
 class AlbumInline(admin.TabularInline):
     """Permite ver/editar os álbuns direto na página do artista."""
     model = Album
@@ -21,10 +27,12 @@ class MusicaInline(admin.TabularInline):
 
 @admin.register(Artista)
 class ArtistaAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'pais_origem', 'qtd_albuns', 'data_criacao']
+    list_display = ['nome', 'pais_origem', 'qtd_albuns', 'aprovado', 'enviado_por', 'data_criacao']
     search_fields = ['nome', 'pais_origem', 'biografia']
-    list_filter = ['pais_origem', 'data_criacao']
+    list_filter = ['aprovado', 'pais_origem', 'data_criacao']
     inlines = [AlbumInline]
+    actions = [aprovar_selecionados]
+    readonly_fields = ['enviado_por']
 
     @admin.display(description='álbuns')
     def qtd_albuns(self, obj):
@@ -33,11 +41,13 @@ class ArtistaAdmin(admin.ModelAdmin):
 
 @admin.register(Album)
 class AlbumAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'artista', 'ano_lancamento', 'genero', 'qtd_musicas']
+    list_display = ['titulo', 'artista', 'ano_lancamento', 'genero', 'qtd_musicas', 'aprovado']
     search_fields = ['titulo', 'artista__nome']
-    list_filter = ['genero', 'ano_lancamento', 'artista']
+    list_filter = ['aprovado', 'genero', 'ano_lancamento', 'artista']
     list_select_related = ['artista']
     inlines = [MusicaInline]
+    actions = [aprovar_selecionados]
+    readonly_fields = ['enviado_por']
 
     @admin.display(description='músicas')
     def qtd_musicas(self, obj):
@@ -46,11 +56,13 @@ class AlbumAdmin(admin.ModelAdmin):
 
 @admin.register(Musica)
 class MusicaAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'album', 'numero_faixa', 'duracao_formatada', 'total_reproducoes']
+    list_display = ['titulo', 'album', 'numero_faixa', 'duracao_formatada', 'total_reproducoes', 'aprovado']
     search_fields = ['titulo', 'album__titulo', 'artistas__nome']
-    list_filter = ['album__genero', 'album__ano_lancamento', 'artistas']
+    list_filter = ['aprovado', 'album__genero', 'album__ano_lancamento', 'artistas']
     list_select_related = ['album']
     filter_horizontal = ['artistas']
+    actions = [aprovar_selecionados]
+    readonly_fields = ['enviado_por']
 
     @admin.display(description='duração')
     def duracao_formatada(self, obj):

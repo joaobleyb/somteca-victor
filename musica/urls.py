@@ -1,4 +1,4 @@
-"""Rotas do app musica (catálogo, ranking, busca e player)."""
+"""Rotas do app musica (catálogo, busca, painel do gestor e player)."""
 from django.urls import path
 
 from . import views
@@ -32,9 +32,9 @@ urlpatterns = [
 
     # Painel do gestor (só equipe)
     path('gestor/', views.PainelGestorView.as_view(), name='gestor'),
+    path('gestor/aprovar/<str:tipo>/<int:pk>/', views.aprovar, name='aprovar'),
 
     # Extras
-    path('ranking/', views.RankingView.as_view(), name='ranking'),
     path('busca/', views.BuscaView.as_view(), name='busca'),
     path('player/reproducao/<int:pk>/', views.registrar_reproducao, name='registrar_reproducao'),
 ]

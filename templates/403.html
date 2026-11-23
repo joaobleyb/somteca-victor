@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{# Página mostrada quando o usuário não tem permissão (ex.: painel do gestor para quem não é da equipe) #}
+
+{% block titulo %}Acesso negado{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="caixa text-center p-4 p-md-5">
+            <i class="bi bi-shield-lock-fill text-warning display-4"></i>
+            <h1 class="h3 fw-bold mt-3">Acesso negado</h1>
+            <p class="text-suave mb-4">Você não tem permissão para abrir esta página. Ela é restrita à equipe da SomTeca.</p>
+            <a href="{% url 'musica:dashboard' %}" class="btn btn-som"><i class="bi bi-house"></i> Voltar ao início</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

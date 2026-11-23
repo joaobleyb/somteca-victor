@@ -4,6 +4,16 @@
 {% block titulo %}{{ musica.titulo }}{% endblock %}
 
 {% block conteudo %}
+{% if not musica.aprovado %}
+<div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <span><i class="bi bi-hourglass-split"></i> Esta música está <strong>aguardando aprovação</strong> e ainda não aparece no site.</span>
+    <form method="post" action="{% url 'musica:aprovar' 'musica' musica.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-som btn-sm"><i class="bi bi-check-lg"></i> Aprovar</button>
+    </form>
+</div>
+{% endif %}
 <section class="cabecalho-detalhe d-flex flex-column flex-md-row align-items-md-end gap-4 mb-4">
     <div class="capa-grande">
         {% include 'partials/capa.html' with imagem=musica.album.capa icone='music-note-beamed' alt=musica.album.titulo %}
@@ -30,7 +40,7 @@
     <button type="button" class="btn-play-grande js-tocar" data-fila="fila-musica" data-indice="0" aria-label="Tocar {{ musica.titulo }}">
         <i class="bi bi-play-fill"></i>
     </button>
-    {% if user.is_authenticated %}
+    {% if user.is_staff %}
     <a href="{% url 'musica:musica_editar' musica.pk %}" class="btn btn-contorno"><i class="bi bi-pencil"></i> Editar</a>
     <a href="{% url 'musica:musica_excluir' musica.pk %}" class="btn btn-outline-danger rounded-pill"><i class="bi bi-trash"></i> Excluir</a>
     {% endif %}

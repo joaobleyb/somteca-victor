@@ -1,8 +1,10 @@
 from django.db import models
 from django.urls import reverse
 
+from .aprovacao import AprovacaoMixin, ArtistaQuerySet
 
-class Artista(models.Model):
+
+class Artista(AprovacaoMixin):
     """Um artista ou banda cadastrado na biblioteca."""
 
     nome = models.CharField('nome', max_length=150, unique=True)
@@ -10,6 +12,8 @@ class Artista(models.Model):
     foto = models.ImageField('foto', upload_to='artistas/', blank=True)
     pais_origem = models.CharField('país de origem', max_length=80)
     data_criacao = models.DateTimeField('data de criação', auto_now_add=True)
+
+    objects = ArtistaQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'artista'

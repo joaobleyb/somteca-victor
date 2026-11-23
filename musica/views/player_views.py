@@ -15,9 +15,9 @@ def registrar_reproducao(request, pk):
     É chamada via fetch() (POST com o token CSRF) pelo arquivo static/js/player.js.
     Responde em JSON para o JavaScript saber que deu certo.
     """
-    musica = get_object_or_404(Musica, pk=pk)
+    musica = get_object_or_404(Musica.objects.aprovados(), pk=pk)
 
-    # Visitantes não logados também contam no ranking (usuario fica vazio)
+    # Visitantes não logados também contam nas mais tocadas (usuario fica vazio)
     usuario = request.user if request.user.is_authenticated else None
     Reproducao.objects.create(usuario=usuario, musica=musica)
 

@@ -22,12 +22,12 @@ class DashboardView(TemplateView):
         contexto['saudacao'] = 'Bom dia' if hora < 12 else 'Boa tarde' if hora < 18 else 'Boa noite'
 
         # Contadores gerais
-        contexto['total_musicas'] = Musica.objects.count()
-        contexto['total_artistas'] = Artista.objects.count()
-        contexto['total_albuns'] = Album.objects.count()
+        contexto['total_musicas'] = Musica.objects.aprovados().count()
+        contexto['total_artistas'] = Artista.objects.aprovados().count()
+        contexto['total_albuns'] = Album.objects.aprovados().count()
         contexto['total_playlists'] = Playlist.objects.count()
 
-        musicas = Musica.objects.select_related('album').prefetch_related('artistas')
+        musicas = Musica.objects.aprovados().select_related('album').prefetch_related('artistas')
 
         # As 8 músicas cadastradas mais recentemente
         contexto['recentes'] = musicas.order_by('-data_criacao')[:8]

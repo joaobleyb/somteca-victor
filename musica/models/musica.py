@@ -2,8 +2,10 @@ from django.core.validators import FileExtensionValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 
+from .aprovacao import AprovacaoMixin, MusicaQuerySet
 
-class Musica(models.Model):
+
+class Musica(AprovacaoMixin):
     """Uma faixa de um álbum, com o arquivo de áudio em .mp3."""
 
     titulo = models.CharField('título', max_length=150)
@@ -37,6 +39,8 @@ class Musica(models.Model):
     # Contador geral de reproduções (atualizado pelo player a cada play)
     total_reproducoes = models.PositiveIntegerField('reproduções', default=0)
     data_criacao = models.DateTimeField('data de criação', auto_now_add=True)
+
+    objects = MusicaQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'música'

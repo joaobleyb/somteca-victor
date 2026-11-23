@@ -129,7 +129,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--reproducoes', type=int, default=800,
-            help='Reproduções falsas a criar para essas faixas aparecerem no ranking (padrão: 800).',
+            help='Reproduções falsas a criar para essas faixas aparecerem nas mais tocadas (padrão: 800).',
         )
 
     def handle(self, *args, **opcoes):
@@ -210,7 +210,7 @@ class Command(BaseCommand):
             playlist.adicionar_musica(musica)
 
     def criar_reproducoes(self, musicas, quantidade):
-        """Plays falsos nos últimos meses, para as faixas aparecerem no ranking e na retrospectiva."""
+        """Plays falsos nos últimos meses, para as faixas aparecerem nas mais tocadas."""
         usuarios = list(User.objects.all()) + [None]
         agora = timezone.now()
         pesos = [random.random() ** 2 for _ in musicas]

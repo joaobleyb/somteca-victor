@@ -1,12 +1,14 @@
 """CRUD de álbuns, com filtro por ano de lançamento."""
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from ..forms import AlbumForm
 from ..models import Album
-from .mixins import ExclusaoMixin, FormularioMixin
+from .mixins import (
+    CadastroComAprovacaoMixin, ExclusaoMixin, FormularioMixin, GestorRequiredMixin, SoAprovadosMixin,
+    VoltarParaNextMixin,
+)
 
 
 class AlbumListView(ListView):
@@ -17,7 +19,7 @@ class AlbumListView(ListView):
     paginate_by = settings.ITENS_POR_PAGINA
 
     def get_queryset(self):
-        albuns = Album.objects.select_related('artista')
+        albuns = Album.objects.aprovados().select_related('artista')
         ano = self.request.GET.get('ano', '')
         if ano.isdigit():
             albuns = albuns.filter(ano_lancamento=int(ano))
@@ -27,7 +29,7 @@ class AlbumListView(ListView):
         contexto = super().get_context_data(**kwargs)
         # Lista de anos existentes, para montar o <select> do filtro
         contexto['anos'] = (
-            Album.objects.order_by('-ano_lancamento')
+            Album.objects.aprovados().order_by('-ano_lancamento')
             .values_list('ano_lancamento', flat=True)
             .distinct()
         )
@@ -35,27 +37,29 @@ class AlbumListView(ListView):
         return contexto
 
 
-class AlbumDetailView(DetailView):
+class AlbumDetailView(SoAprovadosMixin, DetailView):
     """Página do álbum com a lista de faixas, pronta para tocar."""
     model = Album
     template_name = 'musica/album/detalhe.html'
     context_object_name = 'album'
 
     def get_queryset(self):
-        return Album.objects.select_related('artista')
+        return super().get_queryset().select_related('artista')
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
-        musicas = self.object.musicas.select_related('album').prefetch_related('artistas')
+        musicas = self.object.musicas.filter(aprovado=True).select_related('album').prefetch_related('artistas')
         contexto['musicas'] = musicas
         contexto['duracao_total'] = sum(m.duracao for m in musicas)
         return contexto
 
 
-class AlbumCreateView(LoginRequiredMixin, FormularioMixin, CreateView):
+class AlbumCreateView(CadastroComAprovacaoMixin, VoltarParaNextMixin, FormularioMixin, CreateView):
     model = Album
     form_class = AlbumForm
     titulo_pagina = 'Cadastrar álbum'
+    campos_relacionados = ('artista',)
+    url_apos_envio = reverse_lazy('musica:album_lista')
     success_message = 'Álbum "%(objeto)s" cadastrado com sucesso!'
 
     def get_initial(self):
@@ -66,14 +70,14 @@ class AlbumCreateView(LoginRequiredMixin, FormularioMixin, CreateView):
         return inicial
 
 
-class AlbumUpdateView(LoginRequiredMixin, FormularioMixin, UpdateView):
+class AlbumUpdateView(GestorRequiredMixin, VoltarParaNextMixin, FormularioMixin, UpdateView):
     model = Album
     form_class = AlbumForm
     titulo_pagina = 'Editar álbum'
     success_message = 'Álbum "%(objeto)s" atualizado com sucesso!'
 
 
-class AlbumDeleteView(LoginRequiredMixin, ExclusaoMixin, DeleteView):
+class AlbumDeleteView(GestorRequiredMixin, VoltarParaNextMixin, ExclusaoMixin, DeleteView):
     model = Album
     tipo_objeto = 'o álbum'
     aviso_exclusao = 'Todas as músicas deste álbum também serão excluídas.'

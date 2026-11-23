@@ -21,14 +21,52 @@ editar e remover. Só usuários da equipe (is_staff) acessam.
 </div>
 
 {# Contadores #}
-<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+<div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
+    <div class="col"><div class="caixa py-3 {% if total_pendentes %}border border-warning{% endif %}"><div class="text-suave small">Aguardando aprovação</div><div class="fs-3 fw-bold {% if total_pendentes %}text-warning{% endif %}">{{ total_pendentes }}</div></div></div>
     <div class="col"><div class="caixa py-3"><div class="text-suave small">Músicas</div><div class="fs-3 fw-bold">{{ total_musicas }}</div></div></div>
     <div class="col"><div class="caixa py-3"><div class="text-suave small">Álbuns</div><div class="fs-3 fw-bold">{{ total_albuns }}</div></div></div>
     <div class="col"><div class="caixa py-3"><div class="text-suave small">Artistas</div><div class="fs-3 fw-bold">{{ total_artistas }}</div></div></div>
     <div class="col"><div class="caixa py-3"><div class="text-suave small">Reproduções</div><div class="fs-3 fw-bold">{{ total_reproducoes }}</div></div></div>
 </div>
 
+{# Cadastros enviados por usuários, esperando o gestor aprovar ou recusar #}
+<section class="caixa mb-4" id="pendentes">
+    <h2 class="h5 fw-bold mb-3"><i class="bi bi-hourglass-split text-warning"></i> Aguardando aprovação</h2>
+    {% if total_pendentes %}
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Cadastro</th>
+                    <th class="d-none d-md-table-cell">Enviado por</th>
+                    <th class="d-none d-lg-table-cell">Data</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pendentes_artistas %}
+                {% url 'musica:artista_excluir' item.pk as url_recusar %}
+                {% include 'musica/gestor/linha_pendente.html' with tipo='artista' rotulo='Artista' icone='bi-person' detalhe=item.pais_origem %}
+                {% endfor %}
+                {% for item in pendentes_albuns %}
+                {% url 'musica:album_excluir' item.pk as url_recusar %}
+                {% include 'musica/gestor/linha_pendente.html' with tipo='album' rotulo='Álbum' icone='bi-disc' detalhe=item.artista.nome %}
+                {% endfor %}
+                {% for item in pendentes_musicas %}
+                {% url 'musica:musica_excluir' item.pk as url_recusar %}
+                {% include 'musica/gestor/linha_pendente.html' with tipo='musica' rotulo='Música' icone='bi-music-note' detalhe=item.album.titulo %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-suave mb-0"><i class="bi bi-check2-circle text-som"></i> Nenhum cadastro aguardando aprovação.</p>
+    {% endif %}
+</section>
+
 <div class="caixa">
+    <h2 class="h5 fw-bold mb-3"><i class="bi bi-music-note-list"></i> Músicas</h2>
     {# Busca dentro do painel #}
     <form method="get" class="d-flex flex-wrap gap-2 mb-3" role="search">
         <input type="search" name="q" value="{{ termo }}" class="form-control flex-grow-1" style="max-width: 420px"
@@ -54,7 +92,7 @@ editar e remover. Só usuários da equipe (is_staff) acessam.
             <tbody>
                 {% for musica in musicas %}
                 <tr>
-                    <td><a href="{{ musica.get_absolute_url }}" class="link-light fw-semibold text-decoration-none">{{ musica.titulo }}</a></td>
+                    <td><a href="{{ musica.get_absolute_url }}" class="link-light fw-semibold text-decoration-none">{{ musica.titulo }}</a>{% if not musica.aprovado %} <span class="badge bg-warning text-dark">Pendente</span>{% endif %}</td>
                     <td class="d-none d-md-table-cell text-suave">{{ musica.nomes_artistas }}</td>
                     <td class="d-none d-lg-table-cell text-suave">{{ musica.album.titulo }}</td>
                     <td class="text-end d-none d-sm-table-cell text-suave">{{ musica.duracao_formatada }}</td>
@@ -64,7 +102,7 @@ editar e remover. Só usuários da equipe (is_staff) acessam.
                            class="btn btn-sm btn-contorno" title="Editar"><i class="bi bi-pencil"></i><span class="d-none d-xl-inline"> Editar</span></a>
                         <button type="button" class="btn btn-sm btn-outline-danger rounded-pill js-remover"
                                 data-bs-toggle="modal" data-bs-target="#modal-remover"
-                                data-titulo="{{ musica.titulo }}"
+                                data-titulo="{{ musica.titulo }}" data-acao="Remover" data-tipo="música"
                                 data-url="{% url 'musica:musica_excluir' musica.pk %}" title="Remover">
                             <i class="bi bi-trash"></i><span class="d-none d-xl-inline"> Remover</span>
                         </button>
@@ -87,15 +125,15 @@ editar e remover. Só usuários da equipe (is_staff) acessam.
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
             <div class="modal-header">
-                <h2 class="modal-title h5" id="modal-remover-titulo"><i class="bi bi-exclamation-triangle-fill text-warning"></i> Remover música</h2>
+                <h2 class="modal-title h5" id="modal-remover-titulo"><i class="bi bi-exclamation-triangle-fill text-warning"></i> <span id="remover-cabecalho">Remover música</span></h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-                Remover <strong id="remover-titulo"></strong>? O histórico de reproduções dela também será apagado. Esta ação não pode ser desfeita.
+                <span id="remover-acao">Remover</span> <span id="remover-tipo">a música</span> <strong id="remover-titulo"></strong>? <span id="remover-aviso">O histórico de reproduções dela também será apagado.</span> Esta ação não pode ser desfeita.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-contorno" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4">Sim, remover</button>
+                <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4" id="remover-botao">Sim, remover</button>
             </div>
         </form>
     </div>
@@ -107,7 +145,14 @@ editar e remover. Só usuários da equipe (is_staff) acessam.
     // Preenche a janela de confirmação com a música clicada
     document.getElementById('modal-remover').addEventListener('show.bs.modal', function (evento) {
         const botao = evento.relatedTarget;
+        const recusar = botao.dataset.acao === 'Recusar';
         document.getElementById('remover-titulo').textContent = '"' + botao.dataset.titulo + '"';
+        document.getElementById('remover-cabecalho').textContent = botao.dataset.acao + ' ' + botao.dataset.tipo;
+        document.getElementById('remover-acao').textContent = recusar ? 'Recusar e apagar o cadastro' : 'Remover';
+        document.getElementById('remover-tipo').textContent = botao.dataset.tipo === 'música' ? 'da música' : 'do ' + botao.dataset.tipo;
+        document.getElementById('remover-tipo').hidden = !recusar;
+        document.getElementById('remover-aviso').hidden = recusar;
+        document.getElementById('remover-botao').textContent = recusar ? 'Sim, recusar' : 'Sim, remover';
         document.getElementById('form-remover').action = botao.dataset.url;
     });
 </script>

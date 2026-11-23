@@ -4,6 +4,7 @@ Mixins reaproveitados pelas views de cadastro, edição e exclusão.
 Um mixin é uma classe que "acrescenta" um comportamento a outra classe por
 herança. Assim evitamos repetir o mesmo código em todas as views do CRUD.
 """
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
 
@@ -71,3 +72,70 @@ class VoltarParaNextMixin:
         contexto = super().get_context_data(**kwargs)
         contexto['url_next'] = self._url_next()
         return contexto
+
+
+class GestorRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """
+    Só usuários da equipe (is_staff) passam.
+    - Não logado: vai para a página de login.
+    - Logado, mas não é gestor: recebe 403 (acesso negado).
+    """
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+class SoAprovadosMixin:
+    """
+    Nas páginas de detalhe, itens ainda não aprovados só abrem para o gestor
+    (para os demais usuários respondem 404, como se não existissem).
+    """
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_staff:
+            return queryset
+        return queryset.aprovados()
+
+
+class CadastroComAprovacaoMixin(LoginRequiredMixin):
+    """
+    Usado nas CreateView de artista, álbum e música.
+
+    - Gestor: o cadastro já entra aprovado.
+    - Demais usuários: o cadastro fica "aguardando aprovação" e só aparece no
+      site depois que um gestor aprovar no painel. Nos campos de escolha
+      (álbum, artista) eles só veem itens já aprovados.
+    """
+
+    # Campos do formulário que apontam para outros itens do catálogo
+    campos_relacionados = ()
+    url_apos_envio = None  # para onde vai quem não é gestor depois de enviar
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if not self.request.user.is_staff:
+            for nome in self.campos_relacionados:
+                campo = form.fields[nome]
+                campo.queryset = campo.queryset.aprovados()
+        return form
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['vai_para_aprovacao'] = not self.request.user.is_staff
+        return contexto
+
+    def form_valid(self, form):
+        form.instance.enviado_por = self.request.user
+        form.instance.aprovado = self.request.user.is_staff
+        return super().form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        if self.object.aprovado:
+            return super().get_success_message(cleaned_data)
+        return f'"{self.object}" foi enviado e está aguardando a aprovação de um gestor.'
+
+    def get_success_url(self):
+        if self.object.aprovado:
+            return super().get_success_url()
+        return str(self.url_apos_envio)

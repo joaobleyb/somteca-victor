@@ -1,6 +1,6 @@
 # 🎵 SomTeca
 
-**SomTeca** é uma biblioteca de músicas e playlists feita em **Django**, com visual escuro inspirado no Spotify. Tem player de MP3 fixo no rodapé, ranking das mais ouvidas e uma retrospectiva anual no estilo "Wrapped".
+**SomTeca** é uma biblioteca de músicas e playlists feita em **Django**, com visual escuro inspirado no Spotify. Tem player de MP3 fixo no rodapé e um painel do gestor para administrar o catálogo de músicas.
 
 > Projeto acadêmico desenvolvido no **IFRS**.
 
@@ -12,9 +12,9 @@
 |---|---|
 | **CRUD completo** | Cadastrar, listar (cards, 12 por página), ver detalhes, editar e excluir (com confirmação) **artistas, álbuns, músicas e playlists**, usando Class-Based Views e ModelForms |
 | **Player de MP3** | Player fixo no rodapé com play/pause, anterior, próxima, barra de progresso e volume (`<audio>` do HTML5 + JavaScript puro). Cada play é registrado no banco via `fetch` (POST com token CSRF) |
-| **Ranking** | Top 10 de músicas, artistas e álbuns, com filtro por período (última semana, último mês, sempre) e gráfico de barras (Chart.js) |
-| **Retrospectiva** | Resumo do ano do usuário logado: minutos ouvidos, top 5 músicas e artistas, gênero favorito e mês em que mais ouviu (gráfico de linha), tudo em cards coloridos |
-| **Autenticação** | Cadastro, login e logout (`django.contrib.auth`). Só usuários logados criam playlists e veem a retrospectiva, e cada usuário só edita ou exclui as próprias playlists |
+| **Painel do gestor** | Página `/gestor/`, só para a equipe (`is_staff`): tabela de músicas com busca, contadores e paginação, e botões para adicionar, editar e remover (com confirmação) |
+| **Aprovação de cadastros** | Qualquer usuário logado pode cadastrar artistas, álbuns e músicas, mas o cadastro fica "aguardando aprovação" e só aparece no site depois que um gestor clica em **Aprovar** no painel (ou **Recusar**, que apaga). Editar e excluir são exclusivos do gestor |
+| **Autenticação** | Cadastro, login e logout (`django.contrib.auth`). Só usuários logados criam playlists, e cada usuário só edita ou exclui as próprias playlists |
 | **Busca** | Barra no topo que procura em músicas, artistas e álbuns ao mesmo tempo (objetos `Q`) |
 | **Filtros** | Músicas por gênero, álbuns por ano |
 | **Dashboard** | Contadores gerais, músicas adicionadas recentemente e as mais tocadas da semana |
@@ -26,7 +26,6 @@
 - Python 3.12+ e Django 6
 - SQLite
 - Bootstrap 5 e Bootstrap Icons (via CDN)
-- Chart.js 4 (via CDN)
 - Pillow (upload de imagens)
 - Templates Django (sem React e sem API REST)
 
@@ -75,7 +74,7 @@ O comando precisa de internet e baixa cerca de 210 MB. Ele cria:
 - **30 músicas reais de Kevin MacLeod** (licença livre CC BY 4.0, veja os [créditos](#-créditos-das-músicas)) em 6 coletâneas com capas geradas automaticamente: *Lounge & Jazz*, *Diversão Garantida*, *Pixels & Sintetizadores*, *Groove*, *Adrenalina* e *Clássicos Revisitados*;
 - 4 usuários: `demo`, `ana`, `bruno` e `carla`, todos com a senha **`somteca123`**;
 - playlists públicas e privadas, incluindo "Músicas Reais (CC BY)" com as 30 faixas;
-- 4.000 reproduções espalhadas pelos últimos 14 meses, para o ranking e a retrospectiva terem conteúdo.
+- 4.000 reproduções espalhadas pelos últimos 14 meses, para a seção "Em alta nesta semana" ter conteúdo.
 
 Opções: `--limpar` apaga o catálogo antes de popular, e `--reproducoes 10000` muda a quantidade de reproduções.
 
@@ -106,10 +105,10 @@ musica/                       ← app do catálogo
 │   ├── album_views.py        (CRUD + filtro por ano)
 │   ├── musica_views.py       (CRUD + filtro por gênero)
 │   ├── dashboard_views.py
-│   ├── ranking_views.py
+│   ├── gestor_views.py       (painel do gestor, só equipe)
 │   ├── busca_views.py
 │   ├── player_views.py       (registra cada reprodução)
-│   └── mixins.py             (código comum de formulário/exclusão)
+│   └── mixins.py             (código comum de formulário/exclusão + volta ao painel)
 ├── templatetags/somteca_tags.py   ← tag {% fila_json %} que envia a fila ao player
 ├── management/commands/popular_banco.py
 ├── forms.py, admin.py, urls.py, utils.py
@@ -117,16 +116,16 @@ playlists/                    ← app das playlists
 ├── models/ (playlist.py, item_playlist.py)
 ├── views/  (playlist_views.py, item_views.py, mixins.py)
 ├── forms.py, admin.py, urls.py
-usuarios/                     ← app de autenticação + retrospectiva
-├── views/  (auth_views.py, retrospectiva_views.py)
+usuarios/                     ← app de autenticação
+├── views/  (auth_views.py)
 ├── forms.py, urls.py
 templates/                    ← templates com herança, em pastas
 ├── base.html                 (navbar + mensagens + rodapé + player)
 ├── partials/                 (navbar, player, cards, lista de faixas, paginação...)
 ├── compartilhado/            (form.html e confirmar_exclusao.html usados por todo o CRUD)
-├── musica/ (artista/, album/, musica/, dashboard, ranking, busca)
+├── musica/ (artista/, album/, musica/, gestor/, dashboard, busca)
 ├── playlists/
-└── usuarios/ (login, cadastro, retrospectiva)
+└── usuarios/ (login, cadastro)
 static/
 ├── css/style.css             ← tema escuro
 └── js/player.js              ← player de MP3
@@ -157,7 +156,7 @@ erDiagram
 
 - **Como o player sabe o que tocar?** Cada página gera um `<script type="application/json">` com a lista de faixas (tag `{% fila_json %}`). Os botões de play têm `data-fila` e `data-indice`, e o `player.js` lê esse JSON e monta a fila.
 - **Como cada play é registrado?** Quando a faixa começa, o `player.js` faz `fetch(POST)` para `/player/reproducao/<id>/` mandando o cookie `csrftoken` no cabeçalho `X-CSRFToken`. A view cria um `Reproducao` e incrementa o contador com `F()`, o que evita condição de corrida.
-- **Ranking e retrospectiva** usam `annotate(Count(...))` com `filter=Q(...)`, `Sum` e `ExtractMonth`, então toda a agregação é feita pelo banco de dados.
+- **Painel do gestor:** `LoginRequiredMixin` + `UserPassesTestMixin` liberam só a equipe (`is_staff`). Depois de salvar ou excluir, o `?next=` traz o usuário de volta ao painel, aceitando só endereços do próprio site (proteção contra *open redirect*).
 - **Permissões das playlists:** `LoginRequiredMixin` + `UserPassesTestMixin` (`DonoPlaylistMixin`). Playlists privadas de outros usuários retornam 404.
 - **Duração em mm:ss:** o formulário aceita "3:45" e converte para 225 segundos em `clean_duracao`.
 

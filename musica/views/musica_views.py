@@ -1,12 +1,14 @@
 """CRUD de músicas, com filtro por gênero."""
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from ..forms import MusicaForm
 from ..models import GENEROS, Album, Musica
-from .mixins import ExclusaoMixin, FormularioMixin, VoltarParaNextMixin
+from .mixins import (
+    CadastroComAprovacaoMixin, ExclusaoMixin, FormularioMixin, GestorRequiredMixin, SoAprovadosMixin,
+    VoltarParaNextMixin,
+)
 
 
 class MusicaListView(ListView):
@@ -18,7 +20,7 @@ class MusicaListView(ListView):
 
     def get_queryset(self):
         musicas = (
-            Musica.objects
+            Musica.objects.aprovados()
             .select_related('album')
             .prefetch_related('artistas')
             .order_by('titulo')
@@ -36,13 +38,13 @@ class MusicaListView(ListView):
         return contexto
 
 
-class MusicaDetailView(DetailView):
+class MusicaDetailView(SoAprovadosMixin, DetailView):
     model = Musica
     template_name = 'musica/musica/detalhe.html'
     context_object_name = 'musica'
 
     def get_queryset(self):
-        return Musica.objects.select_related('album__artista').prefetch_related('artistas')
+        return super().get_queryset().select_related('album__artista').prefetch_related('artistas')
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -50,7 +52,7 @@ class MusicaDetailView(DetailView):
         contexto['musica_unica'] = [self.object]
         # Outras faixas do mesmo álbum
         contexto['outras_faixas'] = (
-            self.object.album.musicas
+            self.object.album.musicas.aprovados()
             .exclude(pk=self.object.pk)
             .select_related('album')
             .prefetch_related('artistas')
@@ -58,10 +60,12 @@ class MusicaDetailView(DetailView):
         return contexto
 
 
-class MusicaCreateView(LoginRequiredMixin, VoltarParaNextMixin, FormularioMixin, CreateView):
+class MusicaCreateView(CadastroComAprovacaoMixin, VoltarParaNextMixin, FormularioMixin, CreateView):
     model = Musica
     form_class = MusicaForm
     titulo_pagina = 'Cadastrar música'
+    campos_relacionados = ('album', 'artistas')
+    url_apos_envio = reverse_lazy('musica:musica_lista')
     success_message = 'Música "%(objeto)s" cadastrada com sucesso!'
 
     def get_initial(self):
@@ -69,7 +73,8 @@ class MusicaCreateView(LoginRequiredMixin, VoltarParaNextMixin, FormularioMixin,
         inicial = super().get_initial()
         album_id = self.request.GET.get('album', '')
         if album_id.isdigit():
-            album = Album.objects.filter(pk=album_id).first()
+            albuns = Album.objects.all() if self.request.user.is_staff else Album.objects.aprovados()
+            album = albuns.filter(pk=album_id).first()
             if album:
                 inicial['album'] = album
                 inicial['artistas'] = [album.artista]
@@ -77,14 +82,14 @@ class MusicaCreateView(LoginRequiredMixin, VoltarParaNextMixin, FormularioMixin,
         return inicial
 
 
-class MusicaUpdateView(LoginRequiredMixin, VoltarParaNextMixin, FormularioMixin, UpdateView):
+class MusicaUpdateView(GestorRequiredMixin, VoltarParaNextMixin, FormularioMixin, UpdateView):
     model = Musica
     form_class = MusicaForm
     titulo_pagina = 'Editar música'
     success_message = 'Música "%(objeto)s" atualizada com sucesso!'
 
 
-class MusicaDeleteView(LoginRequiredMixin, VoltarParaNextMixin, ExclusaoMixin, DeleteView):
+class MusicaDeleteView(GestorRequiredMixin, VoltarParaNextMixin, ExclusaoMixin, DeleteView):
     model = Musica
     tipo_objeto = 'a música'
     success_url = reverse_lazy('musica:musica_lista')

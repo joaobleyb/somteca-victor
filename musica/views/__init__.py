@@ -12,9 +12,8 @@ from .artista_views import (
 )
 from .busca_views import BuscaView
 from .dashboard_views import DashboardView
-from .gestor_views import PainelGestorView
+from .gestor_views import PainelGestorView, aprovar
 from .musica_views import (
     MusicaCreateView, MusicaDeleteView, MusicaDetailView, MusicaListView, MusicaUpdateView,
 )
 from .player_views import registrar_reproducao
-from .ranking_views import RankingView

@@ -4,6 +4,16 @@
 {% block titulo %}{{ album.titulo }}{% endblock %}
 
 {% block conteudo %}
+{% if not album.aprovado %}
+<div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <span><i class="bi bi-hourglass-split"></i> Este álbum está <strong>aguardando aprovação</strong> e ainda não aparece no site.</span>
+    <form method="post" action="{% url 'musica:aprovar' 'album' album.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-som btn-sm"><i class="bi bi-check-lg"></i> Aprovar</button>
+    </form>
+</div>
+{% endif %}
 <section class="cabecalho-detalhe d-flex flex-column flex-md-row align-items-md-end gap-4 mb-4">
     <div class="capa-grande">
         {% include 'partials/capa.html' with imagem=album.capa icone='disc' alt=album.titulo %}
@@ -29,8 +39,10 @@
     {% endif %}
     {% if user.is_authenticated %}
     <a href="{% url 'musica:musica_criar' %}?album={{ album.pk }}" class="btn btn-contorno"><i class="bi bi-plus-lg"></i> Adicionar faixa</a>
+    {% if user.is_staff %}
     <a href="{% url 'musica:album_editar' album.pk %}" class="btn btn-contorno"><i class="bi bi-pencil"></i> Editar</a>
     <a href="{% url 'musica:album_excluir' album.pk %}" class="btn btn-outline-danger rounded-pill"><i class="bi bi-trash"></i> Excluir</a>
+    {% endif %}
     {% endif %}
 </div>
 

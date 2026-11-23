@@ -11,7 +11,7 @@ O que ele faz:
    Kevin MacLeod (licença CC BY 4.0) e cadastra artista, coletâneas e faixas.
 3. Monta playlists para os usuários com essas músicas.
 4. Cria milhares de reproduções espalhadas pelos últimos ~14 meses, para
-   testar o ranking e a retrospectiva.
+   testar as mais tocadas da semana.
 
 Este arquivo também guarda a função `gerar_capa`, usada para desenhar as capas.
 """
@@ -129,7 +129,7 @@ class Command(BaseCommand):
             f'\nPronto! {len(musicas)} músicas, {Playlist.objects.count()} playlists e '
             f'{Reproducao.objects.count()} reproduções no banco.'
         ))
-        self.stdout.write('Entre com o usuário "demo" e a senha "somteca123" para ver a retrospectiva.')
+        self.stdout.write('Entre com o usuário "demo" e a senha "somteca123" para usar o painel do gestor.')
 
     # ------------------------------------------------------------------
     def criar_usuarios(self):
@@ -161,7 +161,7 @@ class Command(BaseCommand):
     def criar_reproducoes(self, usuarios, musicas, quantidade):
         """
         Cria reproduções falsas nos últimos ~14 meses. Cada usuário tem
-        "músicas favoritas" com mais peso, para o ranking e a retrospectiva
+        "músicas favoritas" com mais peso, para as mais tocadas da semana
         ficarem interessantes (e diferentes entre usuários).
         """
         if not quantidade or not musicas:
